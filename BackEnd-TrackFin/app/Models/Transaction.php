@@ -13,6 +13,7 @@ class Transaction extends Model
         'user_id',
         'category_id',
         'contact_id',
+        'debt_id',
         'amount',
         'type',
         'label',
@@ -38,5 +39,10 @@ class Transaction extends Model
     public function contact()
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function debt()
+    {
+        return $this->belongsTo(Debt::class);
     }
 }

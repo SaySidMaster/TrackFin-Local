@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('contact_id')->nullable();
+            $table->unsignedBigInteger('debt_id')->nullable();
             
             $table->decimal('amount', 12, 2);
             $table->enum('type', ['income', 'expense'])->default('income');
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('set null');
+            $table->foreign('debt_id')->references('id')->on('debts')->onDelete('set null');
         });
     }
 

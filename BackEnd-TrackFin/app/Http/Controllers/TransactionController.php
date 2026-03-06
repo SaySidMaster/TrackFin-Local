@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaction;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\Debt;
 
 class TransactionController extends Controller
 {
@@ -74,6 +75,7 @@ class TransactionController extends Controller
             'date' => 'required|date',
             'category_id' => 'sometimes|integer|exists:categories,id',
             'contact_id' => 'sometimes|integer|exists:contacts,id',
+            'debt_id' => 'sometimes|integer|exists:debts,id',
         ]);
 
         if ($validator->fails()) {
@@ -109,8 +111,21 @@ class TransactionController extends Controller
                 }
                 $data['contact_id'] = $request->contact_id;
             }
+            if ($request->has('debt_id')) {
+                $debt = Debt::where('id', $request->debt_id)->where('user_id', $user->id)->first();
+                if (!$debt) {
+                    return response()->json(['success' => false, 'message' => 'Dette invalide'], 404);
+                }
+                $data['debt_id'] = $request->debt_id;
+            }
 
             $transaction = Transaction::create($data);
+
+            // Mettre à jour les rapports automatiquement
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+
             return response()->json(['success' => true, 'message' => 'Transaction créée avec succès', 'transaction' => $transaction], 201);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la création de la transaction', 'error' => $e->getMessage()], 500);
@@ -127,6 +142,7 @@ class TransactionController extends Controller
             'date' => 'sometimes|date',
             'category_id' => 'sometimes|integer|exists:categories,id',
             'contact_id' => 'sometimes|integer|exists:contacts,id',
+            'debt_id' => 'sometimes|integer|exists:debts,id',
         ]);
 
         if ($validator->fails()) {
@@ -139,10 +155,7 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->first();
-            if (!$transaction) {
-                return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
-            }
+            $oldDate = $transaction->date;
 
             $updateData = [];
             if ($request->has('amount')) $updateData['amount'] = $request->amount;
@@ -165,8 +178,26 @@ class TransactionController extends Controller
                 }
                 $updateData['contact_id'] = $request->contact_id;
             }
+            if ($request->has('debt_id')) {
+                $debt = Debt::where('id', $request->debt_id)->where('user_id', $user->id)->first();
+                if (!$debt) {
+                    return response()->json(['success' => false, 'message' => 'Dette invalide'], 404);
+                }
+                $updateData['debt_id'] = $request->debt_id;
+            }
 
             $transaction->update($updateData);
+
+            // Mettre à jour les rapports automatiquement (ancienne et nouvelle période si la date a changé)
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+
+            if ($oldDate != $transaction->date) {
+                \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $oldDate);
+                \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $oldDate->startOfMonth());
+            }
+
             return response()->json(['success' => true, 'message' => 'Transaction mise à jour avec succès', 'transaction' => $transaction]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour de la transaction', 'error' => $e->getMessage()], 500);
@@ -186,7 +217,14 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
             }
 
+            $transactionDate = $transaction->date;
             $transaction->delete();
+
+            // Mettre à jour les rapports automatiquement après suppression
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transactionDate);
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+
             return response()->json(['success' => true, 'message' => 'Transaction supprimée avec succès']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la suppression de la transaction', 'error' => $e->getMessage()], 500);

@@ -95,6 +95,13 @@ class DebtController extends Controller
             }
 
             $debt = Debt::create($data);
+
+            // Mettre à jour les rapports automatiquement
+            $createdDate = now();
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $createdDate->toDateString());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $createdDate->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $createdDate->toDateString());
+
             return response()->json(['success' => true, 'message' => 'Dette créée avec succès', 'debt' => $debt], 201);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la création de la dette', 'error' => $e->getMessage()], 500);
@@ -143,6 +150,13 @@ class DebtController extends Controller
             }
 
             $debt->update($updateData);
+
+            // Mettre à jour les rapports automatiquement
+            $updatedDate = now();
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $updatedDate->toDateString());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $updatedDate->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $updatedDate->toDateString());
+
             return response()->json(['success' => true, 'message' => 'Dette mise à jour avec succès', 'debt' => $debt]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour de la dette', 'error' => $e->getMessage()], 500);
@@ -163,6 +177,13 @@ class DebtController extends Controller
             }
 
             $debt->delete();
+
+            // Mettre à jour les rapports automatiquement après suppression
+            $deletedDate = now();
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $deletedDate->toDateString());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $deletedDate->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $deletedDate->toDateString());
+
             return response()->json(['success' => true, 'message' => 'Dette supprimée avec succès']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la suppression de la dette', 'error' => $e->getMessage()], 500);

@@ -177,16 +177,7 @@ class AuthentificationController extends Controller
     public function getUser($id)
     {
         try {
-            // Vérification du rôle admin
-            $currentUser = Auth::user();
-            if (!$currentUser || $currentUser->role !== 'admin') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Accès refusé : rôle admin requis'
-                ], 403);
-            }
-
-            // Recherche de l'utilisateur par ID
+            // La vérification de rôle se fait via middleware 'role:admin'
             $user = User::findOrFail($id);
 
             return response()->json([
