@@ -121,6 +121,11 @@ class TransactionController extends Controller
 
             $transaction = Transaction::create($data);
 
+            // Ajuster la dette si nécessaire
+            if (!empty($transaction->debt_id)) {
+                $this->adjustDebt($transaction->debt_id, -$transaction->amount);
+            }
+
             // Mettre à jour les rapports automatiquement
             \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
             \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
@@ -218,7 +223,14 @@ class TransactionController extends Controller
             }
 
             $transactionDate = $transaction->date;
+            $debtId = $transaction->debt_id;
+            $amount = $transaction->amount;
             $transaction->delete();
+
+            // ajuster dette si nécessaire
+            if ($debtId) {
+                $this->adjustDebt($debtId, +$amount);
+            }
 
             // Mettre à jour les rapports automatiquement après suppression
             \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transactionDate);
@@ -229,5 +241,33 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la suppression de la transaction', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Ajuste le montant d'une dette et met à jour son statut.
+     *
+     * @param int $debtId
+     * @param float $deltaAmount positif augmente, négatif diminue
+     */
+    private function adjustDebt($debtId, $deltaAmount)
+    {
+        $debt = Debt::where('id', $debtId)->first();
+        if (!$debt) {
+            return;
+        }
+
+        $original = $debt->getOriginal('amount');
+        $debt->amount += $deltaAmount;
+
+        if ($debt->amount <= 0) {
+            $debt->amount = 0;
+            $debt->status = 'paid';
+        } elseif ($debt->amount < $original) {
+            $debt->status = 'partially_paid';
+        } else {
+            $debt->status = 'pending';
+        }
+
+        $debt->save();
     }
 }

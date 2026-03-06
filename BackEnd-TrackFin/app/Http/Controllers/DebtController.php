@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Debt;
 use App\Models\Contact;
+use App\Models\Transaction;
 
 class DebtController extends Controller
 {
@@ -187,6 +188,69 @@ class DebtController extends Controller
             return response()->json(['success' => true, 'message' => 'Dette supprimée avec succès']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la suppression de la dette', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Enregistrer un paiement de dette : créera une transaction et ajustera la dette.
+     */
+    public function pay(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required|numeric|min:0',
+            'date' => 'sometimes|date',
+            'description' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Erreur de validation', 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
+            }
+
+            $debt = Debt::where('id', $id)->where('user_id', $user->id)->first();
+            if (!$debt) {
+                return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
+            }
+
+            $amount = $request->amount;
+            if ($amount > $debt->amount) {
+                return response()->json(['success' => false, 'message' => 'Le montant de paiement dépasse la dette restante'], 422);
+            }
+
+            // créer transaction de paiement
+            $trans = Transaction::create([
+                'user_id' => $user->id,
+                'amount' => $amount,
+                'type' => 'expense',
+                'label' => 'Paiement dette #' . $debt->id,
+                'description' => $request->description,
+                'date' => $request->date ?? now(),
+                'debt_id' => $debt->id,
+            ]);
+
+            // ajuster la dette
+            $debt->amount -= $amount;
+            if ($debt->amount <= 0) {
+                $debt->amount = 0;
+                $debt->status = 'paid';
+            } elseif ($debt->amount > 0) {
+                $debt->status = 'partially_paid';
+            }
+            $debt->save();
+
+            // mettre à jour les rapports via la même logique que transaction store
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $trans->date);
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $trans->date->startOfMonth());
+            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+
+            return response()->json(['success' => true, 'message' => 'Paiement enregistré', 'transaction' => $trans, 'debt' => $debt]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur lors du paiement', 'error' => $e->getMessage()], 500);
         }
     }
 }

@@ -112,6 +112,11 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('role:admin,accountant')
         ->name('api.debts.destroy');
 
+    // paiement de dette
+    Route::post('/debts/{id}/pay', [DebtController::class, 'pay'])
+        ->middleware('role:admin,accountant')
+        ->name('api.debts.pay');
+
     // Reports (read-only)
     Route::get('/reports', [ReportController::class, 'index'])->name('api.reports.index');
     Route::get('/reports/{id}', [ReportController::class, 'show'])->name('api.reports.show');
