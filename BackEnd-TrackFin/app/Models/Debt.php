@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Debt extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'contact_id',
+        'amount',
+        'type',
+        'due_date',
+        'status',
+        'notes',
+    ];
+
+    protected $casts = [
+        'due_date' => 'datetime',
+        'amount' => 'decimal:2',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class);
+    }
+}
