@@ -1,0 +1,75 @@
+Explication des routes API de TrackFin
+
+1. GET /test : Route de test pour vérifier le fonctionnement de l'API. Paramètres requis : Aucun. Réponse JSON : {"message": "API is working"}.
+
+2. POST /register : Enregistre un nouvel utilisateur dans le système. Paramètres requis : Body JSON {"name": string, "email": string, "password": string}. Réponse JSON : {"user": {"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}, "token": string}.
+
+3. POST /login : Authentifie un utilisateur existant. Paramètres requis : Body JSON {"email": string, "password": string}. Réponse JSON : {"user": {"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}, "token": string}.
+
+4. POST /logout : Déconnecte l'utilisateur authentifié. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : {"message": "Logged out successfully"}.
+
+5. GET /user : Récupère les informations de l'utilisateur actuellement authentifié. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : {"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}.
+
+6. GET /user/{id} : Récupère les informations d'un utilisateur spécifique par son ID (réservé aux admins). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}.
+
+7. PUT /user/{id} : Met à jour les informations d'un utilisateur spécifique (réservé aux admins). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"name": string, "email": string, "role": string}. Réponse JSON : {"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}.
+
+8. GET /users : Liste tous les utilisateurs du système (réservé aux admins). Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "name": string, "email": string, "role": string, "created_at": string, "updated_at": string}, ...].
+
+9. DELETE /user/{id} : Supprime un utilisateur spécifique (réservé aux admins). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "User deleted successfully"}.
+
+10. GET /categories : Liste toutes les catégories disponibles. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "name": string, "description": string, "created_at": string, "updated_at": string}, ...].
+
+11. GET /categories/{id} : Récupère les détails d'une catégorie spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "name": string, "description": string, "created_at": string, "updated_at": string}.
+
+12. POST /categories : Crée une nouvelle catégorie (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Body JSON {"name": string, "description": string}. Réponse JSON : {"id": int, "name": string, "description": string, "created_at": string, "updated_at": string}.
+
+13. PUT /categories/{id} : Met à jour une catégorie existante (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"name": string, "description": string}. Réponse JSON : {"id": int, "name": string, "description": string, "created_at": string, "updated_at": string}.
+
+14. DELETE /categories/{id} : Supprime une catégorie (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Category deleted successfully"}.
+
+15. GET /contacts : Liste tous les contacts. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "name": string, "email": string, "phone": string, "created_at": string, "updated_at": string}, ...].
+
+16. GET /contacts/{id} : Récupère les détails d'un contact spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "name": string, "email": string, "phone": string, "created_at": string, "updated_at": string}.
+
+17. POST /contacts : Crée un nouveau contact (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Body JSON {"name": string, "email": string, "phone": string}. Réponse JSON : {"id": int, "name": string, "email": string, "phone": string, "created_at": string, "updated_at": string}.
+
+18. PUT /contacts/{id} : Met à jour un contact existant (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"name": string, "email": string, "phone": string}. Réponse JSON : {"id": int, "name": string, "email": string, "phone": string, "created_at": string, "updated_at": string}.
+
+19. DELETE /contacts/{id} : Supprime un contact (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Contact deleted successfully"}.
+
+20. GET /budgets : Liste tous les budgets. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "name": string, "amount": float, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}, ...].
+
+21. GET /budgets/{id} : Récupère les détails d'un budget spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "name": string, "amount": float, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+22. POST /budgets : Crée un nouveau budget (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Body JSON {"name": string, "amount": float, "category_id": int, "user_id": int}. Réponse JSON : {"id": int, "name": string, "amount": float, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+23. PUT /budgets/{id} : Met à jour un budget existant (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"name": string, "amount": float, "category_id": int, "user_id": int}. Réponse JSON : {"id": int, "name": string, "amount": float, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+24. DELETE /budgets/{id} : Supprime un budget (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Budget deleted successfully"}.
+
+25. GET /transactions : Liste toutes les transactions. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "amount": float, "type": string, "description": string, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}, ...].
+
+26. GET /transactions/{id} : Récupère les détails d'une transaction spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "amount": float, "type": string, "description": string, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+27. POST /transactions : Crée une nouvelle transaction (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Body JSON {"amount": float, "type": string, "description": string, "category_id": int, "user_id": int}. Réponse JSON : {"id": int, "amount": float, "type": string, "description": string, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+28. PUT /transactions/{id} : Met à jour une transaction existante (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"amount": float, "type": string, "description": string, "category_id": int, "user_id": int}. Réponse JSON : {"id": int, "amount": float, "type": string, "description": string, "category_id": int, "user_id": int, "created_at": string, "updated_at": string}.
+
+29. DELETE /transactions/{id} : Supprime une transaction (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Transaction deleted successfully"}.
+
+30. GET /debts : Liste toutes les dettes. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "created_at": string, "updated_at": string}, ...].
+
+31. GET /debts/{id} : Récupère les détails d'une dette spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "created_at": string, "updated_at": string}.
+
+32. POST /debts : Crée une nouvelle dette (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Body JSON {"amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int}. Réponse JSON : {"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "created_at": string, "updated_at": string}.
+
+33. PUT /debts/{id} : Met à jour une dette existante (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int), Body JSON {"amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int}. Réponse JSON : {"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "created_at": string, "updated_at": string}.
+
+34. DELETE /debts/{id} : Supprime une dette (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Debt deleted successfully"}.
+
+35. POST /debts/{id}/pay : Effectue un paiement sur une dette spécifique (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "paid": boolean, "created_at": string, "updated_at": string}.
+
+36. GET /reports : Liste tous les rapports. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "title": string, "content": string, "user_id": int, "created_at": string, "updated_at": string}, ...].
+
+37. GET /reports/{id} : Récupère les détails d'un rapport spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "title": string, "content": string, "user_id": int, "created_at": string, "updated_at": string}.
