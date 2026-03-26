@@ -115,3 +115,16 @@ body {
     cursor: pointer;
     background-color: transparent;
 }
+
+button {
+    cursor: pointer;
+}
+
+.ScrollableDiv {
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.ScrollableDiv::-webkit-scrollbar {
+  display: none; 
+}

@@ -1,4 +1,4 @@
-function Banner({ title, actionBanner, callToAction, stats }) {
+function Banner({ title, actionBanner, actionBanner2, callToAction, stats }) {
   
   const style = {
     display: "flex", 
@@ -15,6 +15,7 @@ function Banner({ title, actionBanner, callToAction, stats }) {
     <h1>{title}</h1>
     <div style={{display: "flex", gap: "20px", alignItems: "center"}}>
         {actionBanner && actionBanner}
+        {actionBanner2 && actionBanner2}
         {callToAction && callToAction}
         {stats && <p>{stats}</p>}
     </div>

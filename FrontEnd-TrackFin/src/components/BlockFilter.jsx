@@ -127,7 +127,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
           {/* Date début — affichée uniquement si dates.from est fourni */}
           {dates?.from && (
             <input
-              type="date"
+              type={dates.from.mode === "month" ? "month" : "date"}
               value={dates.from.value}
               onChange={dates.from.onChange}
               placeholder={dates.from.placeholder ?? "Date début : --/--/----"}
@@ -138,7 +138,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
           {/* Date fin — affichée uniquement si dates.to est fourni */}
           {dates?.to && (
             <input
-              type="date"
+              type={dates.to.mode === "month" ? "month" : "date"}
               value={dates.to.value}
               onChange={dates.to.onChange}
               placeholder={dates.to.placeholder ?? "Date fin : --/--/----"}

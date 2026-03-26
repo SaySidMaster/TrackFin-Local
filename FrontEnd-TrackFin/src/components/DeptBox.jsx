@@ -1,0 +1,145 @@
+function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay }) {
+
+    // Couleur du badge de statut
+    const statusColor = status === "Payée"
+        ? { backgroundColor: "#dcfce7", color: "#16a34a" }
+        : { backgroundColor: "#fecdd3", color: "#e11d48" };
+
+    return (
+        <div style={{
+            display: "flex",
+            alignItems: "stretch",
+            backgroundColor: "white",
+            borderRadius: "14px",
+            overflow: "hidden",
+            minHeight: "90px",
+            border: "1.5px solid #f1f5f9",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+        }}>
+
+            {/* ── 1. Bloc type (A payer / A recevoir) ───────── */}
+            <div style={{
+                backgroundColor: "#081226",
+                color: "white",
+                minWidth: "90px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "12px 10px",
+                textAlign: "center",
+                fontSize: "12px",
+                fontWeight: "700",
+                width: "130px",
+                textTransform: "uppercase",
+                letterSpacing: "0.3px",
+                lineHeight: "1.4",
+            }}>
+                {type}
+            </div>
+
+            {/* ── 2. Contact + date ─────────────────────────── */}
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: "6px",
+                padding: "12px 16px",
+                width: "300px",
+                borderRight: "1px solid #e2e8f0",
+            }}>
+                {/* Ligne 1 : type contact + badge statut */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                    <span style={{ fontWeight: "700", fontSize: "13px" }}>{typeContact} :</span>
+                    <span style={{
+                        ...statusColor,
+                        borderRadius: "6px",
+                        padding: "3px 12px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        whiteSpace: "nowrap",
+                    }}>
+                        {status}
+                    </span>
+                </div>
+                {/* Ligne 2 : nom + date */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                    <span style={{ fontSize: "13px", color: "#374151" }}>{nameContact}</span>
+                    <span style={{ fontSize: "12px", color: "#6b7280", whiteSpace: "nowrap" }}>Pour le : {date}</span>
+                </div>
+            </div>
+
+            {/* ── 3. Note ───────────────────────────────────── */}
+            <div style={{
+                flex: 1,
+                padding: "12px 16px",
+                fontSize: "13px",
+                color: "#6b7280",
+                lineHeight: "1.5",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+            }}>
+                <span style={{ fontWeight: "500", color: "#374151", marginBottom: "2px" }}>Note :</span>
+                <span style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                }}>
+                    {note}
+                </span>
+            </div>
+
+            {/* ── 4. Montant ────────────────────────────────── */}
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "flex-start",
+                padding: "12px 20px",
+                borderLeft: "1px solid #e2e8f0",
+                minWidth: "140px",
+                gap: "4px",
+            }}>
+                <span style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", color: "#6b7280" }}>
+                    Montant (FCFA)
+                </span>
+                <span style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
+                    {Number(mount).toLocaleString("fr-FR")}
+                </span>
+            </div>
+
+            {/* ── 5. Bouton PAYER ───────────────────────────── */}
+            <div style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 16px",
+                minWidth: "140px",
+            }}>
+                <button
+                    style={{
+                        width: "100%",
+                        height: "44px",
+                        border: "none",
+                        borderRadius: "8px",
+                        backgroundColor: restToPay === 0 ? "#86efac" : "#16a34a",
+                        color: "white",
+                        fontWeight: "700",
+                        fontSize: "13px",
+                        letterSpacing: "0.5px",
+                        cursor: restToPay === 0 ? "not-allowed" : "pointer",
+                        fontFamily: "inherit",
+                    }}
+                    disabled={restToPay === 0}
+                >
+                    {restToPay === 0 ? "PAYÉE ✓" : "PAYER"}
+                </button>
+            </div>
+
+        </div>
+    );
+}
+
+export default DeptBox;

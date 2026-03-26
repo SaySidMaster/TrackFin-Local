@@ -36,7 +36,7 @@ function Transactions() {
 
       {/* Contenu de la page Transactions */}
 
-      <div style={{ height: "100vh" }}> {/* 🔥 base */}
+      <div style={{ height: "70vh" }}> {/* 🔥 base */}
 
         <div
           style={{

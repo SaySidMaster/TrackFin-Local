@@ -45,7 +45,7 @@ const SideNavBar = () => {
         <div className='menuList' style={{width: '100%' }}>
           {menuItems.map((item) => {
             const iconSrc = new URL(`../assets/icons/${item.icon}`, import.meta.url).href
-            const isActive = location.pathname === item.page // 👈 compare avec la route actuelle
+            const isActive = location.pathname.includes(item.page) // 👈 compare avec la route actuelle
 
             return (
               <Link
