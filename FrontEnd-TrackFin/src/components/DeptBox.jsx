@@ -1,4 +1,5 @@
 function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay }) {
+    const currency = import.meta.env.VITE_CURRENCY;
 
     // Couleur du badge de statut
     const statusColor = status === "Payée"
@@ -104,7 +105,7 @@ function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount
                 gap: "4px",
             }}>
                 <span style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", color: "#6b7280" }}>
-                    Montant (FCFA)
+                    Montant ({currency})
                 </span>
                 <span style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
                     {Number(mount).toLocaleString("fr-FR")}

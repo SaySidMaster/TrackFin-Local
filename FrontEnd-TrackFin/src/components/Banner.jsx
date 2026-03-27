@@ -1,4 +1,4 @@
-function Banner({ title, actionBanner, actionBanner2, callToAction, stats }) {
+function Banner({ title, actionBanner, actionBanner2, callToAction }) {
   
   const style = {
     display: "flex", 
@@ -17,7 +17,6 @@ function Banner({ title, actionBanner, actionBanner2, callToAction, stats }) {
         {actionBanner && actionBanner}
         {actionBanner2 && actionBanner2}
         {callToAction && callToAction}
-        {stats && <p>{stats}</p>}
     </div>
     
   </div>

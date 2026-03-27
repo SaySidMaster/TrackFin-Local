@@ -53,7 +53,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
       {/* ── Ligne 1 : Recherche + Selects ────────────────────── */}
       
       {hasRow1 && (
-        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", alignContent: "flex-start", }}>
             <button type="submit" style={{ background: '#081226', width: "40px", height: "40px", border: 'none', borderRadius: '10px', cursor: 'pointer'}} >
                 <img
                     src={searchIcon}
@@ -100,7 +100,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
  
       {/* ── Ligne 2 : Montants + Dates ───────────────────────── */}
       {hasRow2 && (
-        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", alignContent: "flex-start", }}>
  
           {/* Montant min — affiché uniquement si amounts.min est fourni */}
           {amounts?.min && (

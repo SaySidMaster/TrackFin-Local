@@ -29,6 +29,7 @@ function Budgets() {
         height: "75vh",
         display: "flex",
         flexWrap: "wrap",
+        alignContent: "flex-start",
         gap: "12px",
         padding: "20px",
         border: "1px solid #0000001a",

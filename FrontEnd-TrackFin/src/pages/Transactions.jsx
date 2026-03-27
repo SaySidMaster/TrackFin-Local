@@ -5,6 +5,7 @@ import BlockFilter from "../components/BlockFilter";
 import { useState } from "react";
 
 function Transactions() {
+  const currency = import.meta.env.VITE_CURRENCY;
 
   const [q, setQ] = useState("");
   const [type, setType] = useState("");
@@ -71,7 +72,7 @@ function Transactions() {
                   <th style={{ textAlign: "left", width: "100px" }}>ID</th>
                   <th style={{ textAlign: "left", width: "150px" }}>Type</th>
                   <th style={{ textAlign: "left", width: "200px" }}>Libellé</th>
-                  <th style={{ textAlign: "right", width: "150px" }}>Montant</th>
+                  <th style={{ textAlign: "right", width: "150px" }}>Montant ({currency})</th>
                   <th style={{ textAlign: "right", width: "150px" }}>Catégorie</th>
                   <th style={{ textAlign: "right", width: "150px" }}>Date</th>
                 </tr>
@@ -98,7 +99,7 @@ function Transactions() {
                     <td style={{ textAlign: "left", width: "100px" }}>#00{i}</td>
                     <td style={{ textAlign: "left", width: "150px" }}>Dépense</td>
                     <td style={{ textAlign: "left", width: "200px" }}>Maintient Ligdicash</td>
-                    <td style={{ textAlign: "right", width: "150px" }}>160000 FCFA</td>
+                    <td style={{ textAlign: "right", width: "150px" }}>160000</td>
                     <td style={{ textAlign: "right", width: "150px" }}>Facture</td>
                     <td style={{ textAlign: "right", width: "150px" }}>12/01/2023</td>
                   </tr>
