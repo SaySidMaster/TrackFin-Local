@@ -16,6 +16,7 @@ return new class extends Migration
             //Clé étrangère
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
             
             $table->unsignedTinyInteger('month');
             $table->unsignedSmallInteger('year');
@@ -24,6 +25,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('set null');
+            $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
         });
     }
 

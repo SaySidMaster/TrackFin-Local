@@ -10,7 +10,7 @@ use App\Models\Category;
 
 class BudgetController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request) //Retourner les budgets de la même équipe que l'utilisateur connecté
     {
         try {
             $user = Auth::user();
@@ -22,6 +22,9 @@ class BudgetController extends Controller
             $year = $request->get('year');
 
             $query = Budget::where('user_id', $user->id);
+            // S'assurer que les budgets appartiennent à la même équipe que l'utilisateur connecté
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
             if ($month) $query->where('month', $month);
             if ($year) $query->where('year', $year);
             $budgets = $query->orderBy('year', 'desc')->orderBy('month', 'desc')->get();
@@ -75,9 +78,11 @@ class BudgetController extends Controller
             if (!$category) {
                 return response()->json(['success' => false, 'message' => 'Catégorie invalide'], 404);
             }
+            $team_id = Auth::user()->team_id;
 
             $budget = Budget::create([
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'category_id' => $request->category_id,
                 'month' => $request->month,
                 'year' => $request->year,

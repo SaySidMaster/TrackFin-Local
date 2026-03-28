@@ -23,6 +23,8 @@ class DebtController extends Controller
             $status = $request->get('status');
 
             $query = Debt::where('user_id', $user->id);
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
             if ($type && in_array($type, ['to_receive', 'to_pay'])) {
                 $query->where('type', $type);
             }
@@ -74,12 +76,14 @@ class DebtController extends Controller
 
         try {
             $user = Auth::user();
+            $team_id = Auth::user()->team_id;
             if (!$user) {
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
             $data = [
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'amount' => $request->amount,
                 'type' => $request->type,
                 'due_date' => $request->due_date,
@@ -222,9 +226,12 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Le montant de paiement dépasse la dette restante'], 422);
             }
 
+            $team_id = Auth::user()->team_id;
+
             // créer transaction de paiement
             $trans = Transaction::create([
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'amount' => $amount,
                 'type' => 'expense',
                 'label' => 'Paiement dette #' . $debt->id,

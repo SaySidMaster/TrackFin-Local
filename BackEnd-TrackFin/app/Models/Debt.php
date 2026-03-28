@@ -11,6 +11,7 @@ class Debt extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'contact_id',
         'amount',
         'type',
@@ -32,5 +33,10 @@ class Debt extends Model
     public function contact()
     {
         return $this->belongsTo(Contact::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
     }
 }

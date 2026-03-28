@@ -36,9 +36,28 @@ class AuthentificationController extends Controller
         }
 
         try {
+            // Vérification de l'existence de l'utilisateur
+            if (User::where('email', $request->email)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Un utilisateur avec cet email existe déjà'
+                ], 409);
+            }
+            
+            // Création de l'équipe pour l'utilisateur si le team_id n'est pas fourni
+            if (!$request->has('team_id')) {
+                $team = Team::create([
+                    'admin_email' => $request->email,
+                ]);
+                $team_id = $team->id;
+            } else {
+                $team_id = $request->team_id;
+            }
+
             // Création de l'utilisateur
             $user = User::create([
                 'name' => $request->name,
+                'team_id' => $team_id,
                 'email' => $request->email,
                 'role' => $request->role,
                 'password' => Hash::make($request->password), // Hashage explicite du mot de passe
@@ -266,7 +285,7 @@ class AuthentificationController extends Controller
         }
     }
     
-    public function userList(Request $request)
+    public function userList(Request $request) //S'assurer de ne retourner que les utilisateurs de la même équipe que l'utilisateur connecté
     {
         try {
             // Récupération des paramètres de pagination et filtrage
@@ -276,7 +295,8 @@ class AuthentificationController extends Controller
 
             // Construction de la requête
             $query = User::select('id', 'name', 'email', 'role', 'email_verified_at', 'created_at', 'updated_at');
-
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
             // Filtrage par rôle
             if ($role) {
                 $query->where('role', $role);

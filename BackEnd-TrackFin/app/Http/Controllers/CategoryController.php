@@ -30,7 +30,8 @@ class CategoryController extends Controller
 
             // Construction de la requête
             $query = Category::where('user_id', $user->id);
-
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
             // Filtrage par type
             if ($type && in_array($type, ['income', 'expense'])) {
                 $query->where('type', $type);
@@ -127,10 +128,11 @@ class CategoryController extends Controller
                     'message' => 'Utilisateur non authentifié'
                 ], 401);
             }
-
+            $team_id = Auth::user()->team_id;
             // Création de la catégorie
             $category = Category::create([
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'name' => $request->name,
                 'type' => $request->type,
             ]);

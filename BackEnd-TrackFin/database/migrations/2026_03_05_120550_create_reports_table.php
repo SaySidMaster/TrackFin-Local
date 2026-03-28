@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             //Clé étrangère
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
 
             $table->enum('period_type', ['daily', 'monthly', 'dashboard'])->default('daily');
             $table->date('period_date');
@@ -26,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-
+            $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
             // Index pour optimiser les requêtes
             $table->index(['user_id', 'period_type', 'period_date']);
         });

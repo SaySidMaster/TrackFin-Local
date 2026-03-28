@@ -26,6 +26,8 @@ class TransactionController extends Controller
             $search = $request->get('search');
 
             $query = Transaction::where('user_id', $user->id);
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
             if ($type && in_array($type, ['income', 'expense'])) {
                 $query->where('type', $type);
             }
@@ -84,12 +86,14 @@ class TransactionController extends Controller
 
         try {
             $user = Auth::user();
+            $team_id = Auth::user()->team_id;
             if (!$user) {
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
             $data = [
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'amount' => $request->amount,
                 'type' => $request->type,
                 'label' => $request->label,

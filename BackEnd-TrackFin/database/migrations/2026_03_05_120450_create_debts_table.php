@@ -16,6 +16,7 @@ return new class extends Migration
             //Clé étrangère
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('contact_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
             
             $table->decimal('amount', 12, 2);
             $table->enum('type', ['to_receive', 'to_pay'])->default('to_receive');
@@ -26,6 +27,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('set null');
+            $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
         });
     }
 

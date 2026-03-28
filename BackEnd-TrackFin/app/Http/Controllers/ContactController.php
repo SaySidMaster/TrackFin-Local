@@ -21,6 +21,8 @@ class ContactController extends Controller
             $search = $request->get('search');
 
             $query = Contact::where('user_id', $user->id);
+            $team_id = Auth::user()->team_id;
+            $query->where('team_id', $team_id);
 
             if ($type && in_array($type, ['client', 'supplier'])) {
                 $query->where('type', $type);
@@ -76,8 +78,11 @@ class ContactController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
+            $team_id = Auth::user()->team_id;
+            
             $contact = Contact::create([
                 'user_id' => $user->id,
+                'team_id' => $team_id,
                 'name' => $request->name,
                 'type' => $request->type,
                 'phone' => $request->phone,

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             //Clé étrangère
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
 
             $table->string('name');
             $table->enum('type', ['client', 'supplier'])->default('client');
@@ -24,6 +25,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
+
         });
     }
 

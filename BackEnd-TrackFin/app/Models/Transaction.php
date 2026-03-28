@@ -11,6 +11,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'category_id',
         'contact_id',
         'debt_id',
@@ -44,5 +45,10 @@ class Transaction extends Model
     public function debt()
     {
         return $this->belongsTo(Debt::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
     }
 }

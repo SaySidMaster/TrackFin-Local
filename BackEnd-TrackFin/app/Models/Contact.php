@@ -11,6 +11,7 @@ class Contact extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'name',
         'type',
         'phone',
@@ -40,5 +41,13 @@ class Contact extends Model
     public function debts()
     {
         return $this->hasMany(Debt::class);
+    }
+
+    /**
+     * Relation avec l'équipe
+     */
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
     }
 }

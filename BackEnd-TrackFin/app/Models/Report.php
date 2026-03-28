@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Report extends Model
 {
@@ -11,6 +12,7 @@ class Report extends Model
 
     protected $fillable = [
         'user_id',
+        'team_id',
         'period_type',
         'period_date',
         'total_income',
@@ -44,8 +46,10 @@ class Report extends Model
      */
     public static function updateOrCreateForPeriod($userId, $periodType, $periodDate)
     {
+        $team_id = Auth::user()->team_id;
         $report = self::firstOrCreate([
             'user_id' => $userId,
+            'team_id' => $team_id,
             'period_type' => $periodType,
             'period_date' => $periodDate,
         ]);
@@ -106,5 +110,10 @@ class Report extends Model
             'total_debts' => $totalDebts,
             'total_receivables' => $totalReceivables,
         ]);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
     }
 }
