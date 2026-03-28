@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Budget;
 use App\Models\Category;
+use App\Models\Team;
 
 class BudgetController extends Controller
 {

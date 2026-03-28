@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaction;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\Report;
 use App\Models\Debt;
+use App\Models\Team;
 
 class TransactionController extends Controller
 {
@@ -131,9 +133,9 @@ class TransactionController extends Controller
             }
 
             // Mettre à jour les rapports automatiquement
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Transaction créée avec succès', 'transaction' => $transaction], 201);
         } catch (\Exception $e) {
@@ -198,13 +200,13 @@ class TransactionController extends Controller
             $transaction->update($updateData);
 
             // Mettre à jour les rapports automatiquement (ancienne et nouvelle période si la date a changé)
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             if ($oldDate != $transaction->date) {
-                \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $oldDate);
-                \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $oldDate->startOfMonth());
+                Report::updateOrCreateForPeriod($user->id, 'daily', $oldDate);
+                Report::updateOrCreateForPeriod($user->id, 'monthly', $oldDate->startOfMonth());
             }
 
             return response()->json(['success' => true, 'message' => 'Transaction mise à jour avec succès', 'transaction' => $transaction]);
@@ -237,9 +239,9 @@ class TransactionController extends Controller
             }
 
             // Mettre à jour les rapports automatiquement après suppression
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $transactionDate);
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $transactionDate);
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Transaction supprimée avec succès']);
         } catch (\Exception $e) {

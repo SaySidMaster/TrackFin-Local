@@ -1,11 +1,15 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import trackfinLogo from '../assets/trackfin.png'
 import logoutIcon from '../assets/icons/logout.svg'
+import { useDialog } from "../context/DialogContext";
+import { logout } from "../services/AuthServices";
 
 const SideNavBar = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true)
   const location = useLocation() // 👈 récupère la route actuelle
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const menuItems = [
     { id: 1, page: '/dashboard', label: 'Tableau de bord', icon: 'dashboard.svg' },
@@ -31,6 +35,32 @@ const SideNavBar = () => {
     fontSize: '14px',
     fontWeight: isActive ? 'bold' : 'normal',
   })
+
+  const { openDialog } = useDialog();
+
+  const handleUserDialog = async (e) => {
+    openDialog({
+      title: "Ajouter un utilisateur",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "email", type: "email", label: "Email", required: true },
+      ],
+      onSubmit: (values) => console.log("Nouveau user:", values),
+    });
+  };
+
+  const handleLogout = async (e) => {
+    try {
+      const data = await logout();
+      if (data.success){
+        navigate("/login");
+      } else {
+        alert("Échec de la déconnexion. Veuillez réessayer.");
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <nav className='SideNavBar'>
@@ -65,13 +95,15 @@ const SideNavBar = () => {
           })}
         </div>
       </div>
-      <button className='profileButton'>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start' }}>
-          <h3 style={{ margin: '0' }}>SIDIBE Saydil</h3>
-          <p style={{ margin: '0' }}>ADMIN</p>
-        </div>
-        <img src={logoutIcon} style={{ width: '25px', height: '25px', objectFit:'contain' }} alt="" />
-      </button>
+      <div className='profileButton'>
+        <button onClick={handleUserDialog} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start', border: 'none', background: 'transparent' }}>
+          <h3 style={{ margin: '0' }}>{user?.name || "Utilisateur"}</h3>
+          <p style={{ margin: '0', textTransform: 'uppercase' }}>{user?.role || "Utilisateur"}</p>
+        </button>
+        <button onClick={handleLogout} style={{ border: 'none', background: 'transparent' }}>
+          <img src={logoutIcon} style={{ width: '25px', height: '25px', objectFit:'contain' }} alt="" />
+        </button>
+      </div>
     </nav>
   )
 }

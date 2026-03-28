@@ -5,6 +5,7 @@ import Layout from "./layout/Layout";
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Dettes from "./pages/Dettes";
@@ -22,6 +23,7 @@ function App() {
         {/* Route principale avec layout */}
         <Route path="/" element={<Login />}/>
         <Route path="/login" element={<Login />}/>
+        <Route path="/signup" element={<Signup />}/>
         <Route path="/dashboard" element={<Layout />}>
           <Route index element={<Dashboard />} />
         </Route>

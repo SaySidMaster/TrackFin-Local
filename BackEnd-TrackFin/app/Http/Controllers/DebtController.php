@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Debt;
+use App\Models\Report;
 use App\Models\Contact;
 use App\Models\Transaction;
+use App\Models\Team;
 
 class DebtController extends Controller
 {
@@ -103,9 +105,9 @@ class DebtController extends Controller
 
             // Mettre à jour les rapports automatiquement
             $createdDate = now();
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $createdDate->toDateString());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $createdDate->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $createdDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $createdDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $createdDate->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', $createdDate->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Dette créée avec succès', 'debt' => $debt], 201);
         } catch (\Exception $e) {
@@ -158,9 +160,9 @@ class DebtController extends Controller
 
             // Mettre à jour les rapports automatiquement
             $updatedDate = now();
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $updatedDate->toDateString());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $updatedDate->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $updatedDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $updatedDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $updatedDate->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', $updatedDate->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Dette mise à jour avec succès', 'debt' => $debt]);
         } catch (\Exception $e) {
@@ -185,9 +187,9 @@ class DebtController extends Controller
 
             // Mettre à jour les rapports automatiquement après suppression
             $deletedDate = now();
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $deletedDate->toDateString());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $deletedDate->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', $deletedDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $deletedDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $deletedDate->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', $deletedDate->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Dette supprimée avec succès']);
         } catch (\Exception $e) {
@@ -251,9 +253,9 @@ class DebtController extends Controller
             $debt->save();
 
             // mettre à jour les rapports via la même logique que transaction store
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'daily', $trans->date);
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'monthly', $trans->date->startOfMonth());
-            \App\Models\Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'daily', $trans->date);
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $trans->date->startOfMonth());
+            Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Paiement enregistré', 'transaction' => $trans, 'debt' => $debt]);
         } catch (\Exception $e) {
