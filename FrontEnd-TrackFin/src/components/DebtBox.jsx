@@ -1,4 +1,6 @@
-function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay, onClick }) {
+import detailsIcon from "../assets/icons/details.svg";
+
+function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay, onClick, onPay }) {
     const currency = import.meta.env.VITE_CURRENCY;
 
     // Couleur du badge de statut
@@ -7,7 +9,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
         : { backgroundColor: "#fecdd3", color: "#e11d48" };
 
     return (
-        <button onClick={onClick} style={{
+        <div style={{
             display: "flex",
             padding: "0",
             alignItems: "stretch",
@@ -118,9 +120,52 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                 )}
             </div>
 
-            
 
-        </button>
+
+            {/* ── 5. Bouton d'action ────────────────────────────────── */}
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "12px 16px",
+                minWidth: "140px",
+                gap: "8px",
+            }}>
+                {restToPay != 0 && (
+                    <button onClick={onPay}
+                        style={{
+                            width: "100%",
+                            height: "44px",
+                            border: "none",
+                            borderRadius: "8px",
+                            backgroundColor: "#16a34a",
+                            color: "white",
+                            fontWeight: "700",
+                            fontSize: "13px",
+                            letterSpacing: "0.5px",
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                        }}
+                    >
+                        PAYER
+                    </button>
+                )}
+                <button onClick={onClick}
+                    style={{
+                        width: "44px",
+                        height: "44px",
+                        border: "none",
+                        borderRadius: "8px",
+                        backgroundColor: "white",
+                    }}
+                    disabled={restToPay === 0}
+                >
+                    <img src={detailsIcon} alt="details" />
+                </button>
+
+            </div>
+
+        </div>
     );
 }
 

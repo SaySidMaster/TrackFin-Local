@@ -237,10 +237,10 @@ function Field({ field, value, onChange }) {
 }
 
 // ── Composant principal ───────────────────────────────────────────
-function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, onDelete, onNewPassword, fields = [] }) {
+function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}, onChange, onSubmit, onDelete, onNewPassword, fields = [] }) {
 
     if (!isOpen) return null;
-
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         if (onSubmit) onSubmit();
@@ -297,7 +297,8 @@ function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, o
                     borderBottom: "1px solid #f1f5f9",
                 }}>
                     <h2 style={{ margin: 0, fontSize: "20px", fontWeight: "700", color: "#0f172a" }}>
-                        {title}
+                        {title} <br />
+                        {subtitle && <span style={{ fontSize: "14px", fontWeight: "500", color: "#6b7280" }}>{subtitle}</span>}
                     </h2>
                     <button
                         onClick={onClose}
@@ -357,7 +358,7 @@ function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, o
                         borderTop: "1px solid #f1f5f9",
                     }}>
 
-                        {/* Bouton Enregistrer */}
+                        {/* Bouton de soumission */}
                         <button
                             type="submit"
                             className="df-btn-save"
@@ -375,7 +376,7 @@ function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, o
                                 transition: "background-color 0.15s",
                             }}
                         >
-                            Enregistrer
+                            {buttonLabel ?? "Enregistrer"}
                         </button>
 
                         {/* Bouton Supprimer — affiché uniquement si onDelete est fourni */}

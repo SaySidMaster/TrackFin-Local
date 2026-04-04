@@ -8,9 +8,9 @@ export const useDialog = () => useContext(DialogContext);
 
 export function DialogProvider({ children }) {
 
-    const [isOpen, setIsOpen]     = useState(false);
-    const [config, setConfig]     = useState({});
-    const [values, setValues]     = useState({});
+    const [isOpen, setIsOpen] = useState(false);
+    const [config, setConfig] = useState({});
+    const [values, setValues] = useState({});
 
     const openDialog = (dialogConfig) => {
         setConfig(dialogConfig);
@@ -44,6 +44,8 @@ export function DialogProvider({ children }) {
                 isOpen={isOpen}
                 onClose={closeDialog}
                 title={config.title}
+                subtitle={config.subtitle}
+                buttonLabel={config.buttonLabel}
                 fields={config.fields ?? []}
                 values={values}
                 onChange={handleChange}

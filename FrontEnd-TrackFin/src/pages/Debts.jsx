@@ -77,7 +77,7 @@ function Debts() {
         note: debt.notes,
         status: debt.status,
         contact_id: debt.contact_id,
-        due_date: debt.due_date?.split("T")[0], // format YYYY-MM-DD pour <input type="date">
+        date: debt.due_date?.split("T")[0], // format YYYY-MM-DD pour <input type="date">
       },
 
       fields: [
@@ -100,6 +100,29 @@ function Debts() {
           options: contacts.map(contact => ({ value: contact.id, label: contact.name }))
         },
         { key: "due_date", type: "date", label: "Date d'échéance", required: true },
+      ],
+
+      onSubmit: (values) => console.log("Mise à jour dette:", values),
+    });
+  };
+
+  const handleDebtPayementsDialog = (debt) => {
+    openDialog({
+      title: "Payement de dette — " + debt.contact?.name,
+      subtitle: "Montant total : " + debt.amount + " " + import.meta.env.VITE_CURRENCY + " | Reste à payer : " + debt.rest_to_pay + " " + import.meta.env.VITE_CURRENCY,
+      buttonLabel: "Enregistrer le payement",
+      // ── Toutes les valeurs initiales en un seul objet ──
+      initialValues: {
+        amount: debt.amount,
+        description: debt.notes,
+        date:new Date().toISOString().split("T")[0], // date du jour au format YYYY-MM-DD pour <input type="date">
+      },
+
+      fields: [
+        { key: "amount", type: "number", label: "Montant", required: true, max: debt.rest_to_pay, min: 0 },
+        { key: "date", type: "date", label: "Date", required: true , disabled: true },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
+        
       ],
 
       onSubmit: (values) => console.log("Mise à jour dette:", values),
@@ -142,6 +165,7 @@ function Debts() {
           <DebtBox
             key={debt.id}
             onClick={() => handleDebtDetailsDialog(debt)}
+            onPay={() => handleDebtPayementsDialog(debt)}
             id={debt.id}
             type={debt.type === "to_pay" ? "A payer" : "A recevoir"}
             typeContact={debt.contact?.type === "supplier" ? "Fournisseur" : debt.contact?.type === "customer" ? "Client" : "Contact"}
