@@ -1,9 +1,9 @@
 import clientIcon from "../assets/icons/client.svg";
 
-function ProfilBox({ id, name, post, username, status }) {
+function ProfilBox({ id, name, post, username, status, onClick }) {
 
     return (
-        <button style={{
+        <button onClick={onClick} style={{
             display: "flex",
             alignItems: "center",
             backgroundColor: "white",

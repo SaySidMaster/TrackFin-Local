@@ -3,6 +3,7 @@ import CallToAction1 from "../components/CallToAction1";
 import addIcon from "../assets/icons/add.svg";
 import BlockFilter from "../components/BlockFilter";
 import BudgetBox from "../components/BudgetBox";
+import { useDialog } from "../context/DialogContext";
 import { useState } from "react";
 
 function Budgets() {
@@ -11,9 +12,38 @@ function Budgets() {
   const [cat, setCat] = useState("");
   const [fromDate, setDFrom] = useState("");
 
+
+  const { openDialog } = useDialog();
+
+  const handleNewBudgetDialog = async (e) => {
+    openDialog({
+      title: "Ajouter un budget",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "amount_limit", type: "number", label: "Montant limit", required: true },
+        { key: "month", type: "month-select", label: "Mois", required: true },
+        { key: "year", type: "number", label: "Année", placeholder: "2025", required: true, min: 2000, max: 2100, },
+      ],
+      onSubmit: (values) => console.log("Nouveau budget:", values),
+    });
+  };
+
+  const handleBudgetDetailsDialog = async (id) => {
+    openDialog({
+      title: "Détails du budget " + id,
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "amount_limit", type: "number", label: "Montant limit", required: true },
+        { key: "month", type: "month-select", label: "Mois", required: true },
+        { key: "year", type: "number", label: "Année", placeholder: "2025", required: true, min: 2000, max: 2100, },
+      ],
+      onSubmit: (values) => console.log("Détails du budget:", values),
+    });
+  };
+
   return (
     <div className="pageBloc">
-      <Banner title="Budgets" callToAction={<CallToAction1 title="Nouveau budget" iconSrc={addIcon} action={() => { }} />} />
+      <Banner title="Budgets" callToAction={<CallToAction1 title="Nouveau budget" iconSrc={addIcon} action={handleNewBudgetDialog} />} />
       <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
         selects={[
@@ -39,6 +69,7 @@ function Budgets() {
 
         {[...Array(15)].map((_, i) => (
           <BudgetBox
+            onClick={() => handleBudgetDetailsDialog(i)}
             key={i}
             id={i}
             category={i % 2 === 0 ? "Marketing" : "R&D"}

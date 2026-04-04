@@ -39,4 +39,17 @@ class Debt extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    protected $appends = ['rest_to_pay'];
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'debt_id');
+    }
+
+    public function getRestToPayAttribute(): float
+    {
+        $paid = $this->transactions()->sum('amount');
+        return max(0, $this->amount - $paid);
+    }
 }

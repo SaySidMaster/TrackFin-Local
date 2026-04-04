@@ -1,4 +1,4 @@
-function BudgetBox({ id, category, date, amountLimit, actualAmount }) {
+function BudgetBox({ id, category, date, amountLimit, actualAmount, onClick }) {
 
     const statuslabel = actualAmount < amountLimit ? "Limite pas atteinte" : actualAmount > amountLimit ? "Limite dépassée" : "Equilibré";
     const amountLeft = amountLimit - actualAmount;
@@ -8,7 +8,7 @@ function BudgetBox({ id, category, date, amountLimit, actualAmount }) {
         : amountLimit < actualAmount ? { backgroundColor: "#ff000041" } : { backgroundColor: "#00000042" };
 
     return (
-        <button style={{
+        <button onClick={onClick} style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",

@@ -1,4 +1,4 @@
-function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay }) {
+function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount, restToPay, onClick }) {
     const currency = import.meta.env.VITE_CURRENCY;
 
     // Couleur du badge de statut
@@ -7,8 +7,9 @@ function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount
         : { backgroundColor: "#fecdd3", color: "#e11d48" };
 
     return (
-        <div style={{
+        <button onClick={onClick} style={{
             display: "flex",
+            padding: "0",
             alignItems: "stretch",
             backgroundColor: "white",
             borderRadius: "14px",
@@ -101,7 +102,7 @@ function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount
                 alignItems: "flex-start",
                 padding: "12px 20px",
                 borderLeft: "1px solid #e2e8f0",
-                minWidth: "140px",
+                minWidth: "150px",
                 gap: "4px",
             }}>
                 <span style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", color: "#6b7280" }}>
@@ -110,37 +111,17 @@ function DeptBox({ id, type, typeContact, nameContact, date, status, note, mount
                 <span style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
                     {Number(mount).toLocaleString("fr-FR")}
                 </span>
+                {(restToPay !== undefined || restToPay === 0) && (
+                    <span style={{ fontSize: "15px", color: "#0f172a" }}>
+                        Reste : {Number(restToPay).toLocaleString("fr-FR")}
+                    </span>
+                )}
             </div>
 
-            {/* ── 5. Bouton PAYER ───────────────────────────── */}
-            <div style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "12px 16px",
-                minWidth: "140px",
-            }}>
-                <button
-                    style={{
-                        width: "100%",
-                        height: "44px",
-                        border: "none",
-                        borderRadius: "8px",
-                        backgroundColor: restToPay === 0 ? "#86efac" : "#16a34a",
-                        color: "white",
-                        fontWeight: "700",
-                        fontSize: "13px",
-                        letterSpacing: "0.5px",
-                        cursor: restToPay === 0 ? "not-allowed" : "pointer",
-                        fontFamily: "inherit",
-                    }}
-                    disabled={restToPay === 0}
-                >
-                    {restToPay === 0 ? "PAYÉE ✓" : "PAYER"}
-                </button>
-            </div>
+            
 
-        </div>
+        </button>
     );
 }
 
-export default DeptBox;
+export default DebtBox;

@@ -2,6 +2,7 @@ import Banner from "../components/Banner";
 import CallToAction1 from "../components/CallToAction1";
 import addIcon from "../assets/icons/add.svg";
 import BlockFilter from "../components/BlockFilter";
+import { useDialog } from "../context/DialogContext";
 import { useState } from "react";
 
 function Transactions() {
@@ -15,9 +16,63 @@ function Transactions() {
   const [fromDate, setDFrom] = useState("");
   const [toDate, setDTo] = useState("");
 
+  const { openDialog } = useDialog();
+
+  const handleNewTransactionDialog = async (e) => {
+    openDialog({
+      title: "Ajouter une transaction",
+      fields: [
+        { key: "label", type: "text", label: "Label", required: true },
+        { key: "amount", type: "number", label: "Montant", required: true },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
+        {
+          key: "type", type: "select", label: "Type", required: true,
+          options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
+        },
+        
+        {
+          key: "contact_id", type: "select", label: "Client/Fournisseur", required: true,
+          options: [{ value: 1, label: "Société A" }, { value: 2, label: "Société B" }]// à remplacer par les contacts réels de l'utilisateur
+        },
+        
+        {
+          key: "category_id", type: "select", label: "Catégorie", required: true,
+          options: [{ value: 1, label: "Salaire" }, { value: 2, label: "Facture" }]// à remplacer par les catégories réelles de l'utilisateur
+        },
+      ],
+      onSubmit: (values) => console.log("Nouvelle transaction:", values),
+    });
+  };
+
+  const handleTransactionDetailsDialog = async (id) => {
+    openDialog({
+      title: "Détails de la transaction " + id,
+      fields: [
+        { key: "label", type: "text", label: "Label", required: true },
+        { key: "amount", type: "number", label: "Montant", required: true },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
+        {
+          key: "type", type: "select", label: "Type", required: true,
+          options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
+        },
+        
+        {
+          key: "contact_id", type: "select", label: "Client/Fournisseur", required: true,
+          options: [{ value: 1, label: "Société A" }, { value: 2, label: "Société B" }]// à remplacer par les contacts réels de l'utilisateur
+        },
+        
+        {
+          key: "category_id", type: "select", label: "Catégorie", required: true,
+          options: [{ value: 1, label: "Salaire" }, { value: 2, label: "Facture" }]// à remplacer par les catégories réelles de l'utilisateur
+        },
+      ],
+      onSubmit: (values) => console.log("Détails de la transaction:", values),
+    });
+  };
+
   return (
     <div className="pageBloc">
-      <Banner title="150 Transactions" callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={() => { }} />} />
+      <Banner title="150 Transactions" callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={handleNewTransactionDialog} />} />
       <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
         selects={[
@@ -88,8 +143,10 @@ function Transactions() {
               >
                 {[...Array(50)].map((_, i) => (
                   <tr
+                    onClick={() => handleTransactionDetailsDialog(i)}
                     key={i}
                     style={{
+                      cursor: "pointer",
                       display: "table",
                       width: "100%",
                       tableLayout: "fixed",

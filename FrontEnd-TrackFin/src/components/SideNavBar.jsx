@@ -14,7 +14,7 @@ const SideNavBar = () => {
   const menuItems = [
     { id: 1, page: '/dashboard', label: 'Tableau de bord', icon: 'dashboard.svg' },
     { id: 2, page: '/transactions', label: 'Transactions', icon: 'transactions.svg' },
-    { id: 3, page: '/dettes', label: 'Dettes', icon: 'dettes.svg' },
+    { id: 3, page: '/debts', label: 'Dettes', icon: 'dettes.svg' },
     { id: 4, page: '/budgets', label: 'Budgets', icon: 'budgets.svg' },
     { id: 5, page: '/contacts', label: 'Clients & Fournisseurs', icon: 'contacts.svg' },
     { id: 6, page: '/statistiques', label: 'Statistiques', icon: 'statistiques.svg' },
@@ -40,12 +40,24 @@ const SideNavBar = () => {
 
   const handleUserDialog = async (e) => {
     openDialog({
-      title: "Ajouter un utilisateur",
+      title: user.name || "Utilisateur",
       fields: [
         { key: "name", type: "text", label: "Nom", required: true },
         { key: "email", type: "email", label: "Email", required: true },
       ],
       onSubmit: (values) => console.log("Nouveau user:", values),
+      onNewPassword: handlePasswordDialog, // ajoute la fonction pour le changement de mot de passe
+    });
+  };
+
+  const handlePasswordDialog = async (e) => {
+    openDialog({
+      title: "Changer le mot de passe",
+      fields: [
+        { key: "password", type: "password", label: "Nouveau mot de passe", required: true },
+        { key: "confirmedpassword", type: "password", label: "Confirmer le mot de passe", required: true },
+      ],
+      onSubmit: (values) => console.log("Nouveau mot de passe:", values),
     });
   };
 

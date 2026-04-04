@@ -3,6 +3,7 @@ import CategoryBox from "../components/CategoryBox";
 import ProfilBox from "../components/ProfilBox";
 import CallToAction1 from "../components/CallToAction1";
 import addIcon from "../assets/icons/add.svg";
+import { useDialog } from "../context/DialogContext";
 import { useState } from "react";
 
 function Parametres() {
@@ -10,19 +11,86 @@ function Parametres() {
   const [q, setQ] = useState("");
 
   const inputStyle = {
-  height: "40px",
-  padding: "0 14px",
-  border: "1.5px solid #e2e8f0",
-  borderRadius: "10px",
-  fontSize: "13px",
-  fontFamily: "inherit",
-  color: "#0f172a",
-  backgroundColor: "white",
-  outline: "none",
-  appearance: "none",
-  WebkitAppearance: "none",
-  cursor: "text",
-};
+    height: "40px",
+    padding: "0 14px",
+    border: "1.5px solid #e2e8f0",
+    borderRadius: "10px",
+    fontSize: "13px",
+    fontFamily: "inherit",
+    color: "#0f172a",
+    backgroundColor: "white",
+    outline: "none",
+    appearance: "none",
+    WebkitAppearance: "none",
+    cursor: "text",
+  };
+
+
+  const { openDialog } = useDialog();
+
+  const handleNewProfilDialog = async (e) => {
+    openDialog({
+      title: "Ajouter un profil",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "email", type: "email", label: "Email", required: true },
+        {
+          key: "role", type: "select", label: "Rôle", required: true,
+          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "user", label: "Utilisateur" }]
+        },
+
+        { key: "password", type: "password", label: "Mot de passe", required: true },
+
+        { key: "confirmedPassword", type: "password", label: "Confirmer le mot de passe", required: true },
+      ],
+      onSubmit: (values) => console.log("Nouveau profil:", values),
+    });
+  };
+
+  const handleProfilDetailsDialog = async (id) => {
+    openDialog({
+      title: "Détails du profil " + id,
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "email", type: "email", label: "Email", required: true },
+        {
+          key: "role", type: "select", label: "Rôle", required: true,
+          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "user", label: "Utilisateur" }]
+        },
+
+      ],
+      onSubmit: (values) => console.log("Détails du profil:", values),
+    });
+  };
+
+
+  const handleNewCategoryDialog = async (e) => {
+    openDialog({
+      title: "Ajouter une catégorie",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        {
+          key: "type", type: "select", label: "Type", required: true,
+          options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
+        },
+      ],
+      onSubmit: (values) => console.log("Nouvelle catégorie:", values),
+    });
+  };
+
+  const handleCategoryDetailsDialog = async (id) => {
+    openDialog({
+      title: "Détails de la catégorie " + id,
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        {
+          key: "type", type: "select", label: "Type", required: true,
+          options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
+        },
+      ],
+      onSubmit: (values) => console.log("Détails de la catégorie:", values),
+    });
+  };
 
   return (
     <div className="pageBloc">
@@ -48,9 +116,9 @@ function Parametres() {
           border: "1px solid #0000001a",
           borderRadius: "20px",
         }}>
-          <div style={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
+          <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
             <h2>Profils</h2>
-            <CallToAction1 title="Ajouter" iconSrc={addIcon} action={() => { }} />
+            <CallToAction1 title="Ajouter" iconSrc={addIcon} action={handleNewProfilDialog} />
           </div>
           <form action="">
             <div style={{ position: "relative", flex: 2, minWidth: "200px" }}>
@@ -77,6 +145,7 @@ function Parametres() {
                 post={i % 2 === 0 ? "Administrateur" : "Comptable"}
                 username={i % 2 === 0 ? "jean.dupont" : "marie.martin"}
                 status={i % 3 === 0 ? "active" : "inactive"}
+                onClick={() => handleProfilDetailsDialog(i)}
               />
             ))}
           </div>
@@ -94,9 +163,9 @@ function Parametres() {
           border: "1px solid #0000001a",
           borderRadius: "20px",
         }}>
-          <div style={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
+          <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
             <h2>Categories</h2>
-            <CallToAction1 title="Ajouter" iconSrc={addIcon} action={() => { }} />
+            <CallToAction1 title="Ajouter" iconSrc={addIcon} action={handleNewCategoryDialog} />
           </div>
           <form action="">
             <div style={{ position: "relative", flex: 2, minWidth: "200px" }}>
@@ -118,30 +187,35 @@ function Parametres() {
             gap: "12px",
           }}>
             <CategoryBox
-                libelle="Salaire"
-                type="Depense"
-                nbTransactions={15}
-              />
+              libelle="Salaire"
+              type="Depense"
+              nbTransactions={15}
+              onClick={() => handleCategoryDetailsDialog(1)}
+            />
             <CategoryBox
-                libelle="Facture"
-                type="Depense"
-                nbTransactions={15}
-              />
+              libelle="Facture"
+              type="Depense"
+              nbTransactions={15}
+              onClick={() => handleCategoryDetailsDialog(2)}
+            />
             <CategoryBox
-                libelle="Vente"
-                type="Revenus"
-                nbTransactions={15}
-              />
+              libelle="Vente"
+              type="Revenus"
+              nbTransactions={15}
+              onClick={() => handleCategoryDetailsDialog(3)}
+            />
             <CategoryBox
-                libelle="Investissement"
-                type="Depense"
-                nbTransactions={15}
-              />
+              libelle="Investissement"
+              type="Depense"
+              nbTransactions={15}
+              onClick={() => handleCategoryDetailsDialog(4)}
+            />
             <CategoryBox
-                libelle="Recherche et developpement"
-                type="Depense"
-                nbTransactions={15}
-              />
+              libelle="Recherche et developpement"
+              type="Depense"
+              nbTransactions={15}
+              onClick={() => handleCategoryDetailsDialog(5)}
+            />
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import { Outlet, Link } from "react-router-dom";
 import SideNavBar from '../components/SideNavBar.jsx'
 import DialogForm from "../components/DialogForm.jsx";
 import { useState } from "react";
-import { DialogContext } from "../context/DialogContext";
+import { DialogProvider } from "../context/DialogContext";
 
 function Layout() {
 
@@ -30,7 +30,7 @@ function Layout() {
   };
 
   return (
-    <DialogContext.Provider value={{ openDialog }}>
+    <DialogProvider>
       <div className="layoutBloc">
         <DialogForm
           isOpen={open}
@@ -59,7 +59,7 @@ function Layout() {
         <Outlet />
 
       </div>
-    </DialogContext.Provider>
+    </DialogProvider>
   );
 }
 

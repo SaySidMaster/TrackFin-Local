@@ -1,9 +1,9 @@
 import clientIcon from "../assets/icons/client.svg";
 
-function CategoryBox({ libelle, type, nbTransactions }) {
+function CategoryBox({ libelle, type, nbTransactions, onClick }) {
 
     return (
-        <button style={{
+        <button onClick={onClick} style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

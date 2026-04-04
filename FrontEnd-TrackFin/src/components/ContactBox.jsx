@@ -1,10 +1,10 @@
 import clientIcon from "../assets/icons/client.svg";
 import supplierIcon from "../assets/icons/supplier.svg";
 
-function ContactBox({ id, type, name, number, email }) {
+function ContactBox({ id, type, name, number, email, onClick }) {
 
     return (
-        <button style={{
+        <button onClick={onClick} style={{
             display: "flex",
             alignItems: "stretch",
             backgroundColor: "white",

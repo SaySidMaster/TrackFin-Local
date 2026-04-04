@@ -33,8 +33,7 @@ class DebtController extends Controller
             if ($status && in_array($status, ['pending', 'partially_paid', 'paid'])) {
                 $query->where('status', $status);
             }
-
-            $debts = $query->orderBy('due_date', 'asc')->get();
+            $debts = $query->with('contact', 'transactions')->orderBy('due_date', 'asc')->get();
 
             return response()->json(['success' => true, 'debts' => $debts]);
         } catch (\Exception $e) {
@@ -50,7 +49,8 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $debt = Debt::where('id', $id)->where('user_id', $user->id)->first();
+            $debt = Debt::where('id', $id)->where('user_id', $user->id)->with('contact', 'transactions')->first();
+            
             if (!$debt) {
                 return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
             }

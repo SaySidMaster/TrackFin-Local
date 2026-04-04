@@ -1,59 +1,64 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from 'react';
 import './styles/global.css';
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
 import Layout from "./layout/Layout";
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
-import Dettes from "./pages/Dettes";
+import Debts from "./pages/Debts";
 import Budgets from "./pages/Budgets";
 import Contacts from "./pages/Contacts";
 import Statistiques from "./pages/Statistiques";
 import Parametres from "./pages/Parametres";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <BrowserRouter>
       <Routes>
-        {/* Route principale avec layout */}
-        <Route path="/" element={<Login />}/>
-        <Route path="/login" element={<Login />}/>
-        <Route path="/signup" element={<Signup />}/>
-        <Route path="/dashboard" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+        {/* Routes publiques — redirige vers /dashboard si déjà connecté */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Route>
-        <Route path="/transactions" element={<Layout />}>
-          <Route index element={<Transactions />} />
-        </Route>
-        <Route path="/dettes" element={<Layout />}>
-          <Route index element={<Dettes />} />
-        </Route>
-        <Route path="/budgets" element={<Layout />}>
-          <Route index element={<Budgets />} />
-        </Route>
-        <Route path="/contacts" element={<Layout />}>
-          <Route index element={<Contacts />} />
-        </Route>
-        <Route path="/statistiques" element={<Layout />}>
-          <Route index element={<Statistiques />} />
-        </Route>
-        <Route path="/statistiques/journalier" element={<Layout />}>
-          <Route index element={<Statistiques filter="journalier" />} />
-        </Route>
-        <Route path="/statistiques/mensuel" element={<Layout />}>
-          <Route index element={<Statistiques filter="mensuel" />} />
-        </Route>
-        <Route path="/parametres" element={<Layout />}>
-          <Route index element={<Parametres />} />
+
+        {/* Routes protégées — redirige vers /login si pas de token */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+          </Route>
+          <Route path="/dashboard" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+          </Route>
+          <Route path="/transactions" element={<Layout />}>
+            <Route index element={<Transactions />} />
+          </Route>
+          <Route path="/debts" element={<Layout />}>
+            <Route index element={<Debts />} />
+          </Route>
+          <Route path="/budgets" element={<Layout />}>
+            <Route index element={<Budgets />} />
+          </Route>
+          <Route path="/contacts" element={<Layout />}>
+            <Route index element={<Contacts />} />
+          </Route>
+          <Route path="/statistiques" element={<Layout />}>
+            <Route index element={<Statistiques />} />
+          </Route>
+          <Route path="/statistiques/journalier" element={<Layout />}>
+            <Route index element={<Statistiques filter="journalier" />} />
+          </Route>
+          <Route path="/statistiques/mensuel" element={<Layout />}>
+            <Route index element={<Statistiques filter="mensuel" />} />
+          </Route>
+          <Route path="/parametres" element={<Layout />}>
+            <Route index element={<Parametres />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,4 +1,5 @@
 import trashIcon from "../assets/icons/trash.svg";
+import passwordIcon from "../assets/icons/password.svg";
 
 /**
  * DialogForm — Formulaire modal modulaire
@@ -53,7 +54,7 @@ import trashIcon from "../assets/icons/trash.svg";
  *      { key: "post",            type: "select",   label: "Post",              required: true,
  *        options: [{ value: "admin", label: "ADMIN" }, { value: "comptable", label: "Comptable" }] },
  *      { key: "password",        type: "password", label: "Password",          required: true  },
- *      { key: "confirmPassword", type: "password", label: "Confirmed Password",required: true  },
+ *      { key: "confirmedPassword", type: "password", label: "Confirmed Password",required: true  },
  *      { key: "note",            type: "textarea", label: "Note",              placeholder: "...", rows: 4 },
  *      { key: "date",            type: "month",    label: "Date" },
  *    ]}
@@ -180,6 +181,33 @@ function Field({ field, value, onChange }) {
             );
             break;
 
+        // ── Nouveau : sélecteur de mois (liste déroulante) ──────────────
+        case "month-select": 
+            const MONTHS = [
+                "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
+            ];
+            input = (
+                <div style={{ position: "relative" }}>
+                    <select
+                        value={value ?? ""}
+                        onChange={handleChange}
+                        required={required}
+                        disabled={disabled}
+                        style={{ ...selectStyle, color: value ? "#0f172a" : "#9ca3af" }}
+                    >
+                        <option value="" disabled hidden>
+                            {placeholder ?? "Mois..."}
+                        </option>
+                        {MONTHS.map((m, i) => (
+                            <option key={i + 1} value={i + 1}>{m}</option>
+                        ))}
+                    </select>
+                </div>
+            );
+            break;
+        
+
         default: // text | password | email | number | date
             input = (
                 <input
@@ -209,7 +237,7 @@ function Field({ field, value, onChange }) {
 }
 
 // ── Composant principal ───────────────────────────────────────────
-function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, onDelete, fields = [] }) {
+function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, onDelete, onNewPassword, fields = [] }) {
 
     if (!isOpen) return null;
 
@@ -372,6 +400,31 @@ function DialogForm({ isOpen, onClose, title, values = {}, onChange, onSubmit, o
                                 }}
                             >
                                 <img src={trashIcon} alt="Supprimer" style={{ width: "20px", height: "20px", objectFit: "contain" }} />
+                            </button>
+                        )}
+
+                        {/* Bouton Supprimer — affiché uniquement si onDelete est fourni */}
+                        {onNewPassword && (
+                            <button
+                                type="button"
+                                onClick={onNewPassword}
+                                className="df-btn-delete"
+                                title="Supprimer"
+                                style={{
+                                    width: "48px",
+                                    height: "48px",
+                                    backgroundColor: "white",
+                                    border: "1.5px solid #d1d5db",
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "background-color 0.15s, border-color 0.15s",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <img src={passwordIcon} alt="Supprimer" style={{ width: "20px", height: "20px", objectFit: "contain" }} />
                             </button>
                         )}
                     </div>

@@ -3,6 +3,7 @@ import CallToAction1 from "../components/CallToAction1";
 import ListActionBanner from "../components/ListActionBanner";
 import exportIcon from "../assets/icons/exporter.svg";
 import statisticIcon from "../assets/icons/statistics_2.svg";
+import { useDialog } from "../context/DialogContext";
 import BlockFilter from "../components/BlockFilter";
 import { useState } from "react";
 
@@ -22,10 +23,35 @@ function Statistiques({ filter }) {
   const [maxPrice, setPMax] = useState("");
   const [fromDate, setDFrom] = useState("");
   const [toDate, setDTo] = useState("");
+  
+
+  const { openDialog } = useDialog();
+
+  const handleExportDialog = async (e) => {
+    openDialog({
+      title: "Ajouter un budget",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "amount", type: "number", label: "Montant", required: true },
+      ],
+      onSubmit: (values) => console.log("Nouveau budget:", values),
+    });
+  };
+
+  const handleGraphDialog = async (e) => {
+    openDialog({
+      title: "Détails du budget",
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "amount", type: "number", label: "Montant", required: true },
+      ],
+      onSubmit: (values) => console.log("Détails du budget:", values),
+    });
+  };
 
   return (
     <div className="pageBloc">
-      <Banner title="Statistiques" actionBanner={<ListActionBanner filter={filter} />} actionBanner2={<CallToAction1 title="Graphique" iconSrc={statisticIcon} action={() => { }} />}  callToAction={<CallToAction1 title="Exporter" iconSrc={exportIcon} action={() => { }} />} />
+      <Banner title="Statistiques" actionBanner={<ListActionBanner filter={filter} />} actionBanner2={<CallToAction1 title="Graphique" iconSrc={statisticIcon} action={handleGraphDialog} />}  callToAction={<CallToAction1 title="Exporter" iconSrc={exportIcon} action={handleExportDialog} />} />
 
 
 
