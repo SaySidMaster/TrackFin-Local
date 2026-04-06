@@ -182,7 +182,7 @@ function Field({ field, value, onChange }) {
             break;
 
         // ── Nouveau : sélecteur de mois (liste déroulante) ──────────────
-        case "month-select": 
+        case "month-select":
             const MONTHS = [
                 "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                 "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
@@ -206,7 +206,7 @@ function Field({ field, value, onChange }) {
                 </div>
             );
             break;
-        
+
 
         default: // text | password | email | number | date
             input = (
@@ -237,10 +237,10 @@ function Field({ field, value, onChange }) {
 }
 
 // ── Composant principal ───────────────────────────────────────────
-function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}, onChange, onSubmit, onDelete, onNewPassword, fields = [] }) {
+function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}, onChange, onSubmit, onDelete, onNewPassword, disabledSubmit, fields = [] }) {
 
     if (!isOpen) return null;
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (onSubmit) onSubmit();
@@ -358,26 +358,28 @@ function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}
                         borderTop: "1px solid #f1f5f9",
                     }}>
 
-                        {/* Bouton de soumission */}
-                        <button
-                            type="submit"
-                            className="df-btn-save"
-                            style={{
-                                height: "48px",
-                                padding: "0 36px",
-                                backgroundColor: "#081226",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "30px",
-                                fontSize: "15px",
-                                fontWeight: "600",
-                                fontFamily: "inherit",
-                                cursor: "pointer",
-                                transition: "background-color 0.15s",
-                            }}
-                        >
-                            {buttonLabel ?? "Enregistrer"}
-                        </button>
+                        {/* Bouton de soumission ne pas afficher si disabledSubmit est renseigné et true*/}
+                        {!disabledSubmit && (
+                            <button
+                                type="submit"
+                                className="df-btn-save"
+                                style={{
+                                    height: "48px",
+                                    padding: "0 36px",
+                                    backgroundColor: "#081226",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "30px",
+                                    fontSize: "15px",
+                                    fontWeight: "600",
+                                    fontFamily: "inherit",
+                                    cursor: "pointer",
+                                    transition: "background-color 0.15s",
+                                }}
+                            >
+                                {buttonLabel ?? "Enregistrer"}
+                            </button>
+                        )}
 
                         {/* Bouton Supprimer — affiché uniquement si onDelete est fourni */}
                         {onDelete && (

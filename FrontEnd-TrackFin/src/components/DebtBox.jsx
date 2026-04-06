@@ -131,7 +131,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                 minWidth: "140px",
                 gap: "8px",
             }}>
-                {restToPay != 0 && (
+                {restToPay != 0 ? 
                     <button onClick={onPay}
                         style={{
                             width: "100%",
@@ -149,7 +149,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                     >
                         PAYER
                     </button>
-                )}
+                : <div style={{ width: "100%" }}></div>}
                 <button onClick={onClick}
                     style={{
                         width: "44px",
@@ -158,7 +158,6 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                         borderRadius: "8px",
                         backgroundColor: "white",
                     }}
-                    disabled={restToPay === 0}
                 >
                     <img src={detailsIcon} alt="details" />
                 </button>

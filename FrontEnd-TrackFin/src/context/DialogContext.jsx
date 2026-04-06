@@ -45,6 +45,7 @@ export function DialogProvider({ children }) {
                 onClose={closeDialog}
                 title={config.title}
                 subtitle={config.subtitle}
+                disabledSubmit={config.disabledSubmit}
                 buttonLabel={config.buttonLabel}
                 fields={config.fields ?? []}
                 values={values}

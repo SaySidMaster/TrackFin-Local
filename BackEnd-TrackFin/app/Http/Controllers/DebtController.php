@@ -33,7 +33,7 @@ class DebtController extends Controller
             if ($status && in_array($status, ['pending', 'partially_paid', 'paid'])) {
                 $query->where('status', $status);
             }
-            $debts = $query->with('contact', 'transactions')->orderBy('due_date', 'asc')->get();
+            $debts = $query->with('contact', 'transactions')->orderBy('created_at', 'desc')->get();
 
             return response()->json(['success' => true, 'debts' => $debts]);
         } catch (\Exception $e) {
@@ -102,7 +102,8 @@ class DebtController extends Controller
             }
 
             $debt = Debt::create($data);
-
+            // charger les données de la même manière que dans show pour la réponse
+            $debt->load('contact', 'transactions');
             // Mettre à jour les rapports automatiquement
             $createdDate = now();
             Report::updateOrCreateForPeriod($user->id, 'daily', $createdDate->toDateString());
@@ -229,23 +230,25 @@ class DebtController extends Controller
             }
 
             $team_id = Auth::user()->team_id;
-
+            $type = $debt->type === 'to_pay' ? 'expense' : 'income';
             // créer transaction de paiement
             $trans = Transaction::create([
                 'user_id' => $user->id,
                 'team_id' => $team_id,
+                'category_id' => 2, // catégorie "Paiement de dette" par défaut
+                'contact_id' => $debt->contact_id,
                 'amount' => $amount,
-                'type' => 'expense',
+                'type' => $type,
                 'label' => 'Paiement dette #' . $debt->id,
                 'description' => $request->description,
                 'date' => $request->date ?? now(),
                 'debt_id' => $debt->id,
             ]);
 
-            // ajuster la dette
-            $debt->amount -= $amount;
-            if ($debt->amount <= 0) {
-                $debt->amount = 0;
+            // ajuster la le status mais pas le montant de la dette, on garde le montant initial pour l'historique
+            $debt->load('transactions');
+            $totalPaid = $debt->transactions->sum('amount');
+            if ($debt->amount <= $totalPaid) {
                 $debt->status = 'paid';
             } elseif ($debt->amount > 0) {
                 $debt->status = 'partially_paid';

@@ -53,18 +53,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
       {/* ── Ligne 1 : Recherche + Selects ────────────────────── */}
       
       {hasRow1 && (
-        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", alignContent: "flex-start", }}>
-            <button type="submit" style={{ background: '#081226', width: "40px", height: "40px", border: 'none', borderRadius: '10px', cursor: 'pointer'}} >
-                <img
-                    src={searchIcon}
-                    alt='Search'
-                    style={{width: '18px',
-                    height: '18px',
-                    objectFit: 'contain',
-                    filter: 'invert(79%) sepia(50%) saturate(400%) hue-rotate(90deg) brightness(1)'}}
-                />
-            </button>
- 
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", alignContent: "flex-start", }}> 
           {/* Barre de recherche — affichée uniquement si search est fourni */}
           {search && (
             <div style={{ position: "relative", flex: 2, minWidth: "200px" }}>
