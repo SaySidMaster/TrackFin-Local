@@ -30,6 +30,10 @@ class BudgetController extends Controller
             if ($year) $query->where('year', $year);
             $budgets = $query->orderBy('year', 'desc')->orderBy('month', 'desc')->get();
 
+            foreach ($budgets as $budget) {
+                $budget->spent_amount = $budget->getSpentAmount();
+            }
+
             return response()->json(['success' => true, 'budgets' => $budgets]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la récupération des budgets', 'error' => $e->getMessage()], 500);
@@ -48,6 +52,8 @@ class BudgetController extends Controller
             if (!$budget) {
                 return response()->json(['success' => false, 'message' => 'Budget non trouvé'], 404);
             }
+
+            $budget->spent_amount = $budget->getSpentAmount();
 
             return response()->json(['success' => true, 'budget' => $budget]);
         } catch (\Exception $e) {

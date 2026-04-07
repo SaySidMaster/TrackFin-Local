@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Transaction;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\PaymentMethod;
 use App\Models\Report;
 use App\Models\Debt;
 use App\Models\Team;
@@ -76,6 +77,7 @@ class TransactionController extends Controller
             'type' => 'required|in:income,expense',
             'label' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'payment_method_id' => 'nullable|integer|exists:payment_methods,id',
             'date' => 'required|date',
             'category_id' => 'sometimes|integer|exists:categories,id',
             'contact_id' => 'sometimes|integer|exists:contacts,id',
@@ -100,6 +102,7 @@ class TransactionController extends Controller
                 'type' => $request->type,
                 'label' => $request->label,
                 'description' => $request->description,
+                'payment_method_id' => $request->payment_method_id,
                 'date' => $request->date,
             ];
 
@@ -125,16 +128,25 @@ class TransactionController extends Controller
                 $data['debt_id'] = $request->debt_id;
             }
 
+            if ($request->has('payment_method_id')) {
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                if (!$paymentMethod) {
+                    return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
+                }
+                $data['payment_method_id'] = $request->payment_method_id;
+            }
+
             $transaction = Transaction::create($data);
 
             // Ajuster la dette si nécessaire
             if (!empty($transaction->debt_id)) {
-                $this->adjustDebt($transaction->debt_id, -$transaction->amount);
+                $this->adjustDebt($transaction->debt_id);
             }
 
             // Mettre à jour les rapports automatiquement
-            Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            $transactionDate = $transaction->date->copy();
+            Report::updateOrCreateForPeriod($user->id, 'daily',   $transactionDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->copy()->startOfMonth()->toDateString());
             Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Transaction créée avec succès', 'transaction' => $transaction], 201);
@@ -150,6 +162,7 @@ class TransactionController extends Controller
             'type' => 'sometimes|in:income,expense',
             'label' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
+            'payment_method_id' => 'sometimes|nullable|integer|exists:payment_methods,id',
             'date' => 'sometimes|date',
             'category_id' => 'sometimes|integer|exists:categories,id',
             'contact_id' => 'sometimes|integer|exists:contacts,id',
@@ -166,6 +179,11 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
+            $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->first();
+            if (!$transaction) {
+                return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
+            }
+
             $oldDate = $transaction->date;
 
             $updateData = [];
@@ -173,6 +191,7 @@ class TransactionController extends Controller
             if ($request->has('type')) $updateData['type'] = $request->type;
             if ($request->has('label')) $updateData['label'] = $request->label;
             if ($request->has('description')) $updateData['description'] = $request->description;
+            if ($request->has('payment_method_id')) $updateData['payment_method_id'] = $request->payment_method_id;
             if ($request->has('date')) $updateData['date'] = $request->date;
 
             if ($request->has('category_id')) {
@@ -189,6 +208,13 @@ class TransactionController extends Controller
                 }
                 $updateData['contact_id'] = $request->contact_id;
             }
+            if ($request->has('payment_method_id')) {
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                if (!$paymentMethod) {
+                    return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
+                }
+                $updateData['payment_method_id'] = $request->payment_method_id;
+            }
             if ($request->has('debt_id')) {
                 $debt = Debt::where('id', $request->debt_id)->where('user_id', $user->id)->first();
                 if (!$debt) {
@@ -200,8 +226,9 @@ class TransactionController extends Controller
             $transaction->update($updateData);
 
             // Mettre à jour les rapports automatiquement (ancienne et nouvelle période si la date a changé)
-            Report::updateOrCreateForPeriod($user->id, 'daily', $transaction->date);
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $transaction->date->startOfMonth());
+            $transactionDate = $transaction->date->copy();
+            Report::updateOrCreateForPeriod($user->id, 'daily',   $transactionDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->copy()->startOfMonth()->toDateString());
             Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             if ($oldDate != $transaction->date) {
@@ -234,8 +261,12 @@ class TransactionController extends Controller
             $transaction->delete();
 
             // ajuster dette si nécessaire
+            $transactionDate = $transactionDate->copy();
+            Report::updateOrCreateForPeriod($user->id, 'daily',   $transactionDate->toDateString());
+            Report::updateOrCreateForPeriod($user->id, 'monthly', $transactionDate->copy()->startOfMonth()->toDateString());
+
             if ($debtId) {
-                $this->adjustDebt($debtId, +$amount);
+                $this->adjustDebt($debtId); // ← sans delta
             }
 
             // Mettre à jour les rapports automatiquement après suppression
@@ -255,25 +286,21 @@ class TransactionController extends Controller
      * @param int $debtId
      * @param float $deltaAmount positif augmente, négatif diminue
      */
-    private function adjustDebt($debtId, $deltaAmount)
+    private function adjustDebt(int $debtId): void
     {
-        $debt = Debt::where('id', $debtId)->first();
-        if (!$debt) {
-            return;
-        }
+        $debt = Debt::find($debtId);
+        if (!$debt) return;
 
-        $original = $debt->getOriginal('amount');
-        $debt->amount += $deltaAmount;
+        $totalPaid = $debt->transactions()->sum('amount');
 
-        if ($debt->amount <= 0) {
-            $debt->amount = 0;
+        if ($totalPaid >= $debt->amount) {
             $debt->status = 'paid';
-        } elseif ($debt->amount < $original) {
+        } elseif ($totalPaid > 0) {
             $debt->status = 'partially_paid';
         } else {
             $debt->status = 'pending';
         }
 
-        $debt->save();
+        $debt->save(); // ← on ne touche JAMAIS à debt->amount
     }
 }

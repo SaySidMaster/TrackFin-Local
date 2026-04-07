@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Transaction;
 
 class Budget extends Model
 {
@@ -31,5 +32,16 @@ class Budget extends Model
     public function team()
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function getSpentAmount()
+    {
+        return Transaction::where('category_id', $this->category_id)
+            ->where('user_id', $this->user_id)
+            ->where('team_id', $this->team_id)
+            ->whereYear('date', $this->year)
+            ->whereMonth('date', $this->month)
+            ->where('type', 'expense')
+            ->sum('amount');
     }
 }

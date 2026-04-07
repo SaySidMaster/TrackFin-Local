@@ -25,7 +25,7 @@ function BudgetBox({ id, category, date, amountLimit, actualAmount, onClick }) {
 
             {/* Ligne 1 : type + badge statut */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-                <h3 style={{ fontWeight: "700", margin: "0" }}>
+                <h3 style={{ fontWeight: "700", margin: "0", textAlign: "left" }}>
                     {category}<br />
                     <span style={{ fontWeight: "400" }}>{date}</span>
                 </h3>

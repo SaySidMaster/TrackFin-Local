@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Debt;
 use App\Models\Report;
 use App\Models\Contact;
+use App\Models\PaymentMethod;
 use App\Models\Transaction;
 use App\Models\Team;
 
@@ -205,6 +206,7 @@ class DebtController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
+            'payment_method_id' => 'nullable|integer|exists:payment_methods,id',
             'date' => 'sometimes|date',
             'description' => 'nullable|string',
         ]);
@@ -229,6 +231,13 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Le montant de paiement dépasse la dette restante'], 422);
             }
 
+            if ($request->has('payment_method_id')) {
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                if (!$paymentMethod) {
+                    return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
+                }
+            }
+
             $team_id = Auth::user()->team_id;
             $type = $debt->type === 'to_pay' ? 'expense' : 'income';
             // créer transaction de paiement
@@ -241,6 +250,7 @@ class DebtController extends Controller
                 'type' => $type,
                 'label' => 'Paiement dette #' . $debt->id,
                 'description' => $request->description,
+                'payment_method_id' => $request->payment_method_id,
                 'date' => $request->date ?? now(),
                 'debt_id' => $debt->id,
             ]);

@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DebtController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\ReportController;
 
 Route::get('/test', [AuthentificationController::class, 'test'])->name('api.test');
@@ -85,7 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index'])->name('api.transactions.index');
     Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('api.transactions.show');
 
-    // création/modification supprime pour roles admin/accountant
+    // création/modification suppression réservées aux roles admin/accountant
     Route::post('/transactions', [TransactionController::class, 'store'])
         ->middleware('role:admin,accountant')
         ->name('api.transactions.store');
@@ -95,6 +96,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/transactions/{id}', [TransactionController::class, 'destroy'])
         ->middleware('role:admin,accountant')
         ->name('api.transactions.destroy');
+
+    // Payment methods
+    Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('api.paymentMethods.index');
+    Route::get('/payment-methods/{id}', [PaymentMethodController::class, 'show'])->name('api.paymentMethods.show');
+
+    Route::post('/payment-methods', [PaymentMethodController::class, 'store'])
+        ->middleware('role:admin,accountant')
+        ->name('api.paymentMethods.store');
+    Route::put('/payment-methods/{id}', [PaymentMethodController::class, 'update'])
+        ->middleware('role:admin,accountant')
+        ->name('api.paymentMethods.update');
+    Route::delete('/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])
+        ->middleware('role:admin,accountant')
+        ->name('api.paymentMethods.destroy');
 
 
     // Debts

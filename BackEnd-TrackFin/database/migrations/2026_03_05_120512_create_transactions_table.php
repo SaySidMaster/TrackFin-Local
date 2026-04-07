@@ -6,11 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    
+    
     public function up(): void
     {
+        Schema::create('payment_methods', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('team_id')->nullable();
+            $table->string('name');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
+        });
+
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             //Clé étrangère
@@ -24,6 +34,7 @@ return new class extends Migration
             $table->enum('type', ['income', 'expense'])->default('income');
             $table->string('label');
             $table->text('description');
+            $table->unsignedBigInteger('payment_method_id')->nullable();
             $table->dateTime('date');
             $table->timestamps();
 
@@ -32,6 +43,7 @@ return new class extends Migration
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('set null');
             $table->foreign('debt_id')->references('id')->on('debts')->onDelete('set null');
             $table->foreign('team_id')->references('id')->on('teams')->onDelete('set null');
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('set null');
         });
     }
 

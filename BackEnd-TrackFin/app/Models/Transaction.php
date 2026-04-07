@@ -19,6 +19,7 @@ class Transaction extends Model
         'type',
         'label',
         'description',
+        'payment_method_id',
         'date',
     ];
 
@@ -45,6 +46,11 @@ class Transaction extends Model
     public function debt()
     {
         return $this->belongsTo(Debt::class);
+    }
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function team()
