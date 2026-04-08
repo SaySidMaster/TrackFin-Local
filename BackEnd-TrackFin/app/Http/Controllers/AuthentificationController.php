@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Team;
+use App\Models\Category;
+use App\Models\PaymentMethod;
 
 class AuthentificationController extends Controller
 {
@@ -45,8 +47,10 @@ class AuthentificationController extends Controller
                 ], 409);
             }
             
-            // Création de l'équipe pour l'utilisateur si le team_id n'est pas fourni
-            if (!$request->has('team_id')) {
+            // Récupération du team_id de l'utilisateur connecté, sinon création d'une équipe
+            if (Auth::check()) {
+                $team_id = Auth::user()->team_id;
+            } elseif (!$request->has('team_id')) {
                 $team = Team::create([
                     'admin_email' => $request->email,
                 ]);
@@ -63,6 +67,36 @@ class AuthentificationController extends Controller
                 'role' => $request->role,
                 'password' => Hash::make($request->password), // Hashage explicite du mot de passe
             ]);
+
+            // Créer les catégories par défaut si c'est une nouvelle team
+            if (!$request->has('team_id')) {
+                Category::create([
+                    'name' => 'Ventes',
+                    'type' => 'income',
+                    'user_id' => $user->id,
+                    'team_id' => $team_id,
+                ]);
+
+                Category::create([
+                    'name' => 'Dettes',
+                    'type' => 'expense',
+                    'user_id' => $user->id,
+                    'team_id' => $team_id,
+                ]);
+
+                // Créer les méthodes de paiement par défaut
+                PaymentMethod::create([
+                    'name' => 'Espèce',
+                    'user_id' => $user->id,
+                    'team_id' => $team_id,
+                ]);
+
+                PaymentMethod::create([
+                    'name' => 'Orange Money',
+                    'user_id' => $user->id,
+                    'team_id' => $team_id,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -81,6 +115,79 @@ class AuthentificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de l\'utilisateur',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function store(Request $request)
+    {
+        // Validation des données
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'role' => 'required|string|in:admin,accountant,user',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur de validation',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur non authentifié'
+            ], 401);
+        }
+
+        if (!$currentUser->team_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucune équipe associée à l\'utilisateur connecté'
+            ], 400);
+        }
+
+        try {
+            if (User::where('email', $request->email)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Un utilisateur avec cet email existe déjà'
+                ], 409);
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'team_id' => $currentUser->team_id,
+                'email' => $request->email,
+                'role' => $request->role,
+                'password' => Hash::make($request->password),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Utilisateur ajouté à l\'équipe avec succès',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'team_id' => $user->team_id,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'ajout de l\'utilisateur',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -295,7 +402,7 @@ class AuthentificationController extends Controller
             $search = $request->get('search');
 
             // Construction de la requête
-            $query = User::select('id', 'name', 'email', 'role', 'email_verified_at', 'created_at', 'updated_at');
+            $query = User::select('id', 'name', 'status', 'email', 'role', 'email_verified_at', 'created_at', 'updated_at');
             $team_id = Auth::user()->team_id;
             $query->where('team_id', $team_id);
             // Filtrage par rôle
@@ -314,8 +421,8 @@ class AuthentificationController extends Controller
             // Tri par date de création (plus récent en premier)
             $query->orderBy('created_at', 'desc');
 
-            // Pagination
-            $users = $query->paginate($perPage);
+            // Récupération de tous les utilisateurs sans pagination
+            $users = $query->get();
 
             return response()->json([
                 'success' => true,
@@ -354,6 +461,41 @@ class AuthentificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Utilisateur non authentifié'
+                ], 401);
+            }
+
+            $user->toggleStatus();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Statut mis à jour avec succès',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'status' => $user->status,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour du statut',
                 'error' => $e->getMessage()
             ], 500);
         }

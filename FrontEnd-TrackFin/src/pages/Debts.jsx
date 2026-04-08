@@ -7,11 +7,13 @@ import BlockFilter from "../components/BlockFilter";
 import DebtBox from "../components/DebtBox";
 import { getDebts, createDebt, deleteDebt, updateDebt, payDebt } from "../services/DebtServices";
 import { getContacts } from "../services/ContactServices";
+import { getPaymentMethods } from "../services/PaymentMethodsServices";
 
 function Debts() {
 
   const [debts, setDebts] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,9 +31,10 @@ function Debts() {
         setLoading(true);
         const data = await getDebts();
         const data2 = await getContacts();
-        console.log("Données contact :", data2);
+        const data3 = await getPaymentMethods();
         setDebts(data.debts);
         setContacts(data2.contacts);
+        setPaymentMethods(data3.payment_methods);
       } catch (err) {
         setError(err.message ?? "Erreur lors du chargement des dettes");
       } finally {
@@ -86,7 +89,6 @@ function Debts() {
 
           // Option 2 : Ajouter la nouvelle dette directement au debut dans le state grâce aux infos de data (moins de charge, mais risque de désynchronisation)
           setDebts(prev => [data.debt, ...prev]);
-          console.log("Données :", data);
         } catch (error) {
           alert(error.message);
         }
@@ -168,7 +170,10 @@ function Debts() {
         { key: "amount", type: "number", label: "Montant", required: true, max: debt.rest_to_pay, min: 0 },
         { key: "date", type: "date", label: "Date", required: true, disabled: true },
         { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
-
+        {
+          key: "payment_method_id", type: "select", label: "Moyen de paiement", required: true,
+          options: paymentMethods.map(method => ({ value: method.id, label: method.name }))
+        },
       ],
 
       onSubmit: async (values) => {

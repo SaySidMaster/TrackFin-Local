@@ -17,8 +17,7 @@ const SideNavBar = () => {
     { id: 3, page: '/debts', label: 'Dettes', icon: 'dettes.svg' },
     { id: 4, page: '/budgets', label: 'Budgets', icon: 'budgets.svg' },
     { id: 5, page: '/contacts', label: 'Clients & Fournisseurs', icon: 'contacts.svg' },
-    { id: 6, page: '/statistiques', label: 'Statistiques', icon: 'statistiques.svg' },
-    { id: 7, page: '/parametres', label: 'Paramètres', icon: 'parametres.svg' },
+    { id: 6, page: '/parametres', label: 'Paramètres', icon: 'parametres.svg' },
   ]
 
   const getIconStyle = (isActive) => ({
@@ -63,14 +62,12 @@ const SideNavBar = () => {
 
   const handleLogout = async (e) => {
     try {
-      const data = await logout();
-      if (data.success){
-        navigate("/login");
-      } else {
-        alert("Échec de la déconnexion. Veuillez réessayer.");
-      }
+      await logout();
     } catch (error) {
-      alert(error.message);
+      console.error("Erreur lors du logout:", error);
+    } finally {
+      // Redirection systématique vers login après une tentative de logout
+      navigate("/login");
     }
   };
 

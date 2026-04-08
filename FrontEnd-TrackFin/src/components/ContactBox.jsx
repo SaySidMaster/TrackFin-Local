@@ -38,7 +38,7 @@ function ContactBox({ id, type, name, number, email, onClick }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "start", justifyContent: "center", gap: "12px" }}>
-                <h3 style={{ fontWeight: "700", margin: "0" }}>
+                <h3 style={{ fontWeight: "700", margin: "0", textAlign: "left", fontSize: "16px" }}>
                     {type} : <span style={{ fontWeight: "400" }}>{name}</span>
                 </h3>
                 <p style={{ textAlign: "left", fontSize: "13px", color: "#374151", margin: "0" }}>

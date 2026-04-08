@@ -69,7 +69,3 @@ Explication des routes API de TrackFin
 34. DELETE /debts/{id} : Supprime une dette (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"message": "Debt deleted successfully"}.
 
 35. POST /debts/{id}/pay : Effectue un paiement sur une dette spécifique (réservé aux admins et comptables). Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "amount": float, "description": string, "creditor": string, "due_date": string, "user_id": int, "paid": boolean, "created_at": string, "updated_at": string}.
-
-36. GET /reports : Liste tous les rapports. Paramètres requis : Header Authorization: Bearer {token}. Réponse JSON : [{"id": int, "title": string, "content": string, "user_id": int, "created_at": string, "updated_at": string}, ...].
-
-37. GET /reports/{id} : Récupère les détails d'un rapport spécifique. Paramètres requis : Header Authorization: Bearer {token}, Param URL id (int). Réponse JSON : {"id": int, "title": string, "content": string, "user_id": int, "created_at": string, "updated_at": string}.

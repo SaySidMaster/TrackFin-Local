@@ -44,7 +44,7 @@ class CategoryController extends Controller
             }
 
             // Tri par nom
-            $query->orderBy('name', 'asc');
+            $query->orderBy('id', 'asc');
 
             $categories = $query->get();
 

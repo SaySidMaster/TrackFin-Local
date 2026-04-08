@@ -33,7 +33,7 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->enum('type', ['income', 'expense'])->default('income');
             $table->string('label');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->unsignedBigInteger('payment_method_id')->nullable();
             $table->dateTime('date');
             $table->timestamps();

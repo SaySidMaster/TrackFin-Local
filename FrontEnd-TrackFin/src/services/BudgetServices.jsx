@@ -5,7 +5,6 @@ export const getBudgets = () => {
 };
 
 export const createBudget = async (budgetData) => {
-  console.log("Datas:", budgetData);
   const data = await apiFetch("/budgets", {
     method: "POST",
     body: JSON.stringify(budgetData),

@@ -1,12 +1,37 @@
-function BudgetBox({ id, category, date, amountLimit, actualAmount, onClick }) {
+function BudgetBox({ id, category, date, amountLimit, spentAmount, onClick }) {
 
-    const statuslabel = actualAmount < amountLimit ? "Limite pas atteinte" : actualAmount > amountLimit ? "Limite dépassée" : "Equilibré";
-    const amountLeft = amountLimit - actualAmount;
+    const amountLeft = amountLimit - spentAmount;
+    //cas du status avec switchcase
+    const statusLabel = (() => {
+        switch (true) {
+            case amountLeft == 0:
+                return "Equilibré";
+            case amountLeft < 0:
+                return "Limite dépassée";
+                break;
+            case amountLeft > 0 && amountLeft <= amountLimit:
+                return "Limite pas atteinte";
+                break;
+            default:
+                return "Equilibré";
+        }
+    })();
+
     // Couleur du badge de statut
-    const statusColor = amountLimit > actualAmount
-        ? { backgroundColor: "#16c0604f" }
-        : amountLimit < actualAmount ? { backgroundColor: "#ff000041" } : { backgroundColor: "#00000042" };
-
+    const statusColor = (() => {
+        switch (true) {
+            case amountLeft == 0:
+                return { backgroundColor: "#00000042" };
+            case amountLeft < 0:
+                return { backgroundColor: "#ff000041" };
+                break;
+            case amountLeft > 0 && amountLeft <= amountLimit:
+                return { backgroundColor: "#16c0604f" };
+                break;
+            default:
+                return { backgroundColor: "#00000042" };
+        }
+    })();
     return (
         <button onClick={onClick} style={{
             display: "flex",
@@ -30,7 +55,7 @@ function BudgetBox({ id, category, date, amountLimit, actualAmount, onClick }) {
                     <span style={{ fontWeight: "400" }}>{date}</span>
                 </h3>
                 <p style={{ ...statusColor, borderRadius: "6px", padding: "3px 12px", fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap" }}>
-                    {statuslabel}
+                    {statusLabel}
                 </p>
             </div>
 
@@ -39,7 +64,7 @@ function BudgetBox({ id, category, date, amountLimit, actualAmount, onClick }) {
                 <span style={{ fontSize: "15px", color: "#374151" }}>Limite : </span>
                 <span style={{ fontSize: "15px", color: "#374151" }}>{amountLimit}</span>
             </div>
-                
+
             {/* Ligne 3 : Montant restant */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
                 <span style={{ fontSize: "15px", color: "#374151" }}>Restant : </span>

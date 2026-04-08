@@ -55,4 +55,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Team::class, 'team_user');
     }
+
+    /**
+     * Bascule le statut du profil entre active et inactive
+     */
+    public function toggleStatus(): void
+    {
+        $this->status = $this->status === 'active' ? 'inactive' : 'active';
+        $this->save();
+    }
 }

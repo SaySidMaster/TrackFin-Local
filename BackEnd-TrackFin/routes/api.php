@@ -8,7 +8,6 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\PaymentMethodController;
-use App\Http\Controllers\ReportController;
 
 Route::get('/test', [AuthentificationController::class, 'test'])->name('api.test');
 
@@ -18,6 +17,7 @@ Route::post('/login', [AuthentificationController::class, 'login'])->name('api.l
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthentificationController::class, 'logout'])->name('api.logout');
     Route::get('/user', [AuthentificationController::class, 'user'])->name('api.user');
+    Route::post('/user/toggle-status', [AuthentificationController::class, 'toggleStatus'])->name('api.user.toggleStatus');
 
     // Admin-only operations
     Route::get('/user/{id}', [AuthentificationController::class, 'getUser'])
@@ -32,6 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user/{id}', [AuthentificationController::class, 'deleteUser'])
         ->middleware('role:admin')
         ->name('api.deleteUser');
+
+        Route::post('/users', [AuthentificationController::class, 'store'])
+        ->middleware('role:admin')
+        ->name('api.users.store');
 
 
     // Categories
@@ -131,8 +135,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/debts/{id}/pay', [DebtController::class, 'pay'])
         ->middleware('role:admin,accountant')
         ->name('api.debts.pay');
-
-    // Reports (read-only)
-    Route::get('/reports', [ReportController::class, 'index'])->name('api.reports.index');
-    Route::get('/reports/{id}', [ReportController::class, 'show'])->name('api.reports.show');
 });

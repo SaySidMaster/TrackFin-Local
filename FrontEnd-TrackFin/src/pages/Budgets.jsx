@@ -28,7 +28,6 @@ function Budgets() {
         setLoading(true);
         const data = await getBudgets();
         const data2 = await getCategories();
-        console.log("Budgets:", data);
         setBudgets(data.budgets);
         setCategories(data2.categories);
       } catch (err) {
@@ -173,7 +172,7 @@ function Budgets() {
             category={categories.find(c => c.id === budget.category_id)?.name ?? "-"}
             date={`${String(budget.month).padStart(2, "0")}/${budget.year}`}
             amountLimit={budget.amount_limit}
-            actualAmount={budget.spent_amount}
+            spentAmount={budget.spent_amount}
           />
         ))}
 

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Category;
 use App\Models\Debt;
-use App\Models\Report;
 use App\Models\Contact;
 use App\Models\PaymentMethod;
 use App\Models\Transaction;
@@ -105,11 +105,6 @@ class DebtController extends Controller
             $debt = Debt::create($data);
             // charger les données de la même manière que dans show pour la réponse
             $debt->load('contact', 'transactions');
-            // Mettre à jour les rapports automatiquement
-            $createdDate = now();
-            Report::updateOrCreateForPeriod($user->id, 'daily', $createdDate->toDateString());
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $createdDate->startOfMonth());
-            Report::updateOrCreateForPeriod($user->id, 'dashboard', $createdDate->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Dette créée avec succès', 'debt' => $debt], 201);
         } catch (\Exception $e) {
@@ -160,12 +155,6 @@ class DebtController extends Controller
 
             $debt->update($updateData);
 
-            // Mettre à jour les rapports automatiquement
-            $updatedDate = now();
-            Report::updateOrCreateForPeriod($user->id, 'daily', $updatedDate->toDateString());
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $updatedDate->startOfMonth());
-            Report::updateOrCreateForPeriod($user->id, 'dashboard', $updatedDate->toDateString());
-
             return response()->json(['success' => true, 'message' => 'Dette mise à jour avec succès', 'debt' => $debt]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur lors de la mise à jour de la dette', 'error' => $e->getMessage()], 500);
@@ -186,12 +175,6 @@ class DebtController extends Controller
             }
 
             $debt->delete();
-
-            // Mettre à jour les rapports automatiquement après suppression
-            $deletedDate = now();
-            Report::updateOrCreateForPeriod($user->id, 'daily', $deletedDate->toDateString());
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $deletedDate->startOfMonth());
-            Report::updateOrCreateForPeriod($user->id, 'dashboard', $deletedDate->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Dette supprimée avec succès']);
         } catch (\Exception $e) {
@@ -244,8 +227,8 @@ class DebtController extends Controller
             $trans = Transaction::create([
                 'user_id' => $user->id,
                 'team_id' => $team_id,
-                'category_id' => 2, // catégorie "Paiement de dette" par défaut
                 'contact_id' => $debt->contact_id,
+                'category_id' => Category::where('name', 'Dettes')->where('team_id', $team_id)->first()->id, // mettre la catgorie nommé Dettes dans la table categories
                 'amount' => $amount,
                 'type' => $type,
                 'label' => 'Paiement dette #' . $debt->id,
@@ -264,11 +247,6 @@ class DebtController extends Controller
                 $debt->status = 'partially_paid';
             }
             $debt->save();
-
-            // mettre à jour les rapports via la même logique que transaction store
-            Report::updateOrCreateForPeriod($user->id, 'daily', $trans->date);
-            Report::updateOrCreateForPeriod($user->id, 'monthly', $trans->date->startOfMonth());
-            Report::updateOrCreateForPeriod($user->id, 'dashboard', now()->toDateString());
 
             return response()->json(['success' => true, 'message' => 'Paiement enregistré', 'transaction' => $trans, 'debt' => $debt]);
         } catch (\Exception $e) {

@@ -10,7 +10,6 @@ import Transactions from "./pages/Transactions";
 import Debts from "./pages/Debts";
 import Budgets from "./pages/Budgets";
 import Contacts from "./pages/Contacts";
-import Statistiques from "./pages/Statistiques";
 import Parametres from "./pages/Parametres";
 
 function App() {
@@ -42,15 +41,6 @@ function App() {
           </Route>
           <Route path="/contacts" element={<Layout />}>
             <Route index element={<Contacts />} />
-          </Route>
-          <Route path="/statistiques" element={<Layout />}>
-            <Route index element={<Statistiques />} />
-          </Route>
-          <Route path="/statistiques/journalier" element={<Layout />}>
-            <Route index element={<Statistiques filter="journalier" />} />
-          </Route>
-          <Route path="/statistiques/mensuel" element={<Layout />}>
-            <Route index element={<Statistiques filter="mensuel" />} />
           </Route>
           <Route path="/parametres" element={<Layout />}>
             <Route index element={<Parametres />} />

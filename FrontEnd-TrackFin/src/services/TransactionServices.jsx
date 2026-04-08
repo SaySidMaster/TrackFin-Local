@@ -5,7 +5,6 @@ export const getTransactions = () => {
 };
 
 export const createTransaction = async (transactionData) => {
-  console.log("Datas:", transactionData);
   const data = await apiFetch("/transactions", {
     method: "POST",
     body: JSON.stringify(transactionData),

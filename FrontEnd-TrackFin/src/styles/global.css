@@ -125,6 +125,10 @@ button {
     scrollbar-width: none;
 }
 
+.ScrollableDiv2 {
+    overflow-x: auto;
+}
+
 .ScrollableDiv::-webkit-scrollbar {
   display: none; 
 }

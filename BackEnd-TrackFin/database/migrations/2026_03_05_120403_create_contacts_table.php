@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('type', ['client', 'supplier'])->default('client');
             $table->string('phone');
             $table->string('email');
-            $table->string('notes');
+            $table->string('notes')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');

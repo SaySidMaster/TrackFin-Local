@@ -44,16 +44,23 @@ export const signup = async (userData) => {
  * LOGOUT
  */
 export const logout = async () => {
-  const data = await apiFetch("/logout", {
-    method: "POST",
-    body: JSON.stringify({ token: localStorage.getItem("token") }),
-  });
+  try {
+    const data = await apiFetch("/logout", {
+      method: "POST",
+      body: JSON.stringify({ token: localStorage.getItem("token") }),
+    });
 
-  if (!data.success) {
-    throw new Error("Erreur lors de la déconnexion");
+    if (!data.success) {
+      throw new Error("Erreur lors de la déconnexion");
+    }
+
+    return data;
+  } catch (error) {
+    // Nettoie quand même le localStorage en cas d'erreur (ex: utilisateur n'existe plus)
+    console.error("Erreur logout:", error.message);
+  } finally {
+    // Toujours nettoyer le localStorage pour éviter d'être bloqué
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  return data;
 };

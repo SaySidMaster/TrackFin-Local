@@ -77,9 +77,9 @@ function Transactions() {
       },
       fields: [
         { key: "label", type: "text", label: "Label", required: true },
-        { key: "date", type: "date", label: "Date", required: true, disabled: true, initialValue: new Date().toISOString().split("T")[0] },
+        { key: "date", type: "date", label: "Date", required: true, initialValue: new Date().toISOString().split("T")[0] },
         { key: "amount", type: "number", label: "Montant", required: true },
-        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true  },
         {
           key: "type", type: "select", label: "Type", required: true,
           options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
@@ -127,7 +127,7 @@ function Transactions() {
         { key: "label", type: "text", label: "Label", required: true, disabled: true },
         { key: "date", type: "date", label: "Date", required: true, disabled: true },
         { key: "amount", type: "number", label: "Montant", required: true, disabled: true },
-        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true  },
         {
           key: "type", type: "select", label: "Type", required: true,
           options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
@@ -214,7 +214,7 @@ function Transactions() {
 
   return (
     <div className="pageBloc">
-      <Banner title="150 Transactions" callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={handleNewTransactionDialog} />} />
+      <Banner title={`${filteredTransactions.length} Transactions`} callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={handleNewTransactionDialog} />} />
       <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
         selects={[
@@ -284,7 +284,7 @@ function Transactions() {
                   }}
                 >
                   <th style={{ textAlign: "left", width: "200px" }}>Libellé</th>
-                  <th style={{ textAlign: "left", width: "200px" }}>Contact</th>
+                  <th style={{ textAlign: "left", width: "100px" }}>Contact</th>
                   <th style={{ textAlign: "right", width: "150px" }}>Montant ({currency})</th>
                   <th style={{ textAlign: "right", width: "150px" }}>Catégorie</th>
                   <th style={{ textAlign: "right", width: "150px" }}>Date</th>
@@ -320,8 +320,8 @@ function Transactions() {
                         marginBottom: "10px",
                       }}
                     >
-                      <td style={{ textAlign: "left", width: "200px" }}>{transaction.description ?? "-"}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.type === "income" ? "Revenu" : transaction.type === "expense" ? "Dépense" : transaction.type}</span></td>
-                      <td style={{ textAlign: "left", width: "200px" }}>{transaction.contact?.name || transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.name : "-"}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.type : "-"}</span></td>
+                      <td style={{ textAlign: "left", width: "200px" }}>{transaction.label ?? transaction.description}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.type === "income" ? "Revenu" : transaction.type === "expense" ? "Dépense" : transaction.type}</span></td>
+                      <td style={{ textAlign: "left", width: "100px" }}>{transaction.contact?.name || transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.name : "-"}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.type : "-"}</span></td>
                       <td style={{ textAlign: "right", width: "150px" }}>{transaction.amount}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.payment_method_id ? paymentMethods.find(m => String(m.id) === String(transaction.payment_method_id))?.name : "-"}</span></td>
                       <td style={{ textAlign: "right", width: "150px" }}>{categoryName}</td>
                       <td style={{ textAlign: "right", width: "150px" }}>{formattedDate}</td>

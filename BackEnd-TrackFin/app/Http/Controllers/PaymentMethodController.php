@@ -26,7 +26,7 @@ class PaymentMethodController extends Controller
                 $query->where('name', 'like', '%' . $search . '%');
             }
 
-            $paymentMethods = $query->orderBy('name', 'asc')->get();
+            $paymentMethods = $query->orderBy('id', 'asc')->get();
 
             return response()->json(['success' => true, 'payment_methods' => $paymentMethods]);
         } catch (\Exception $e) {
