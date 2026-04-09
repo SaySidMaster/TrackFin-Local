@@ -1,41 +1,42 @@
 import Banner from "../components/Banner";
-import { useState } from "react";
-
-const data = [
-  { mois: "Jan", valeur: 320000 },
-  { mois: "Fév", valeur: 150000 },
-  { mois: "Mar", valeur: 480000 },
-  { mois: "Avr", valeur: -80000 },
-  { mois: "Mai", valeur: 290000 },
-  { mois: "Juin", valeur: 510000 },
-  { mois: "Juil", valeur: 120000 },
-  { mois: "Août", valeur: -50000 },
-  { mois: "Sep", valeur: 430000 },
-  { mois: "Oct", valeur: 370000 },
-  { mois: "Nov", valeur: 260000 },
-  { mois: "Déc", valeur: 590000 },
-];
-
-const STATS = [
-  { label: "Revenus",       valeur: 100000, couleur: "#16a34a", icone: "↑" },
-  { label: "Dépenses",      valeur: 10000,  couleur: "#ef4444", icone: "↓" },
-  { label: "Dettes",        valeur: 25000,  couleur: "#f59e0b", icone: "⚠" },
-  { label: "Créances",      valeur: 75000,  couleur: "#3b82f6", icone: "→" },
-  { label: "Budget",        valeur: 50000,  couleur: "#8b5cf6", icone: "◎" },
-  { label: "Reste budget",  valeur: 40000,  couleur: "#0ea5e9", icone: "≈" },
-];
+import { useState, useEffect } from "react";
+import { getDashboard } from "../services/DashboardServices";
 
 const fmt = (n) => Number(n).toLocaleString("fr-FR");
 
 function Dashboard() {
   const currency = import.meta.env.VITE_CURRENCY;
   const [hovered, setHovered] = useState(null);
+  const [dashData, setDashData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const max    = Math.max(...data.map(d => Math.abs(d.valeur)));
-  const total  = data.reduce((s, d) => s + d.valeur, 0);
+  useEffect(() => {
+    getDashboard()
+      .then(res => setDashData(res.data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="pageBloc"><p>Chargement...</p></div>;
+  if (!dashData) return <div className="pageBloc"><p>Erreur de chargement</p></div>;
+
+  const { evolution, transaction_count, periode,
+    total_income, total_expense,
+    total_debts, total_receivables,
+    total_budget, rest_budget } = dashData;
+
+  const STATS = [
+    { label: "Revenus", valeur: total_income, couleur: "#16a34a", icone: "↑" },
+    { label: "Dépenses", valeur: total_expense, couleur: "#ef4444", icone: "↓" },
+    { label: "Dettes", valeur: total_debts, couleur: "#f59e0b", icone: "⚠" },
+    { label: "Créances", valeur: total_receivables, couleur: "#3b82f6", icone: "→" },
+    { label: "Budget", valeur: total_budget, couleur: "#8b5cf6", icone: "◎" },
+    { label: "Reste budget", valeur: rest_budget, couleur: "#0ea5e9", icone: "≈" },
+  ];
+
+  const max = Math.max(...evolution.map(d => Math.abs(d.valeur)), 1);
+  const total = evolution.reduce((s, d) => s + d.valeur, 0);
   const positif = total >= 0;
-
-  // Lignes de grille horizontales
   const gridLines = [0, 25, 50, 75, 100];
 
   return (
@@ -69,7 +70,7 @@ function Dashboard() {
           <div>
             <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>Transactions</h2>
             <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>
-              <strong style={{ color: "#0f172a" }}>150 transactions</strong> · mois de septembre
+              <strong style={{ color: "#0f172a" }}>{transaction_count} transactions</strong> · mois de septembre
             </p>
           </div>
 
@@ -180,10 +181,10 @@ function Dashboard() {
             gap: "6px",
             paddingBottom: 1,
           }}>
-            {data.map((d, i) => {
+            {evolution.map((d, i) => {
               const hauteurPct = (Math.abs(d.valeur) / max) * 100;
-              const isPos      = d.valeur >= 0;
-              const isHovered  = hovered === i;
+              const isPos = d.valeur >= 0;
+              const isHovered = hovered === i;
 
               return (
                 <div
@@ -217,7 +218,7 @@ function Dashboard() {
                         borderLeft: "5px solid transparent",
                         borderRight: "5px solid transparent",
                         borderTop: "5px solid #0f172a",
-                      }}/>
+                      }} />
                     </div>
                   )}
 

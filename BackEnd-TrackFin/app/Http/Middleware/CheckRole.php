@@ -24,7 +24,7 @@ class CheckRole
             return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
         }
 
-        $allowed = explode(',', $roles);
+        $allowed = explode('|', $roles);
         if (!in_array($user->role, $allowed)) {
             return response()->json(['success' => false, 'message' => 'Accès interdit, rôle requis: ' . $roles], 403);
         }

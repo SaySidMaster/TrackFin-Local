@@ -30,8 +30,8 @@ class CategoryController extends Controller
             $search = $request->get('search');
 
             // Construction de la requête
-            $query = Category::where('user_id', $user->id);
-            $team_id = Auth::user()->team_id;
+            $query = Category::query();
+            $team_id = $user->team_id;
             $query->where('team_id', $team_id);
             // Filtrage par type
             if ($type && in_array($type, ['income', 'expense'])) {
@@ -78,7 +78,7 @@ class CategoryController extends Controller
             }
 
             // Recherche de la catégorie
-            $category = Category::where('id', $id)->where('user_id', $user->id)->first();
+            $category = Category::where('id', $id)->where('team_id', $user->team_id)->first();
 
             if (!$category) {
                 return response()->json([
@@ -183,7 +183,7 @@ class CategoryController extends Controller
             }
 
             // Recherche de la catégorie
-            $category = Category::where('id', $id)->where('user_id', $user->id)->first();
+            $category = Category::where('id', $id)->where('team_id', $user->team_id)->first();
 
             if (!$category) {
                 return response()->json([
@@ -232,7 +232,7 @@ class CategoryController extends Controller
             }
 
             // Recherche de la catégorie
-            $category = Category::where('id', $id)->where('user_id', $user->id)->first();
+            $category = Category::where('id', $id)->where('team_id', $user->team_id)->first();
 
             if (!$category) {
                 return response()->json([

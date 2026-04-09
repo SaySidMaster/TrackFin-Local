@@ -8,7 +8,7 @@ import { useDialog } from "../context/DialogContext";
 import { useState, useEffect, useMemo } from "react";
 import { getCategories, createCategory, deleteCategory, updateCategory } from "../services/CategoryServices";
 import { getPaymentMethods, createPaymentMethod, deletePaymentMethod, updatePaymentMethod } from "../services/PaymentMethodsServices";
-import { getUsers, createUser, updateUser, deleteUser } from "../services/UserServices";
+import { getUsers, createUser, updateUser, deleteUser, changeOwnPassword, changeUserPassword } from "../services/UserServices";
 
 function Parametres() {
 
@@ -66,7 +66,7 @@ function Parametres() {
         { key: "email", type: "email", label: "Email", required: true },
         {
           key: "role", type: "select", label: "Rôle", required: true,
-          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "user", label: "Utilisateur" }]
+          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "cashier", label: "Caissier" }, { value: "user", label: "Utilisateur" }]
         },
         { key: "password", type: "password", label: "Mot de passe", required: true },
         { key: "confirmedPassword", type: "password", label: "Confirmer le mot de passe", required: true },
@@ -94,6 +94,9 @@ function Parametres() {
   };
 
   const handleProfileDetailsDialog = async (profile) => {
+    // L'utilisateur connecté est par défaut et ne peut pas être modifiées dans le localstorage
+    const isDefaultProfile = profile.email === JSON.parse(localStorage.getItem("user")).email;
+
     openDialog({
       title: "Détails du profil — " + profile.name,
       initialValues: {
@@ -104,17 +107,21 @@ function Parametres() {
       },
       fields: [
         { key: "name", type: "text", label: "Nom", required: true },
-        { key: "email", type: "email", label: "Email", required: true },
+        { key: "email", type: "email", label: "Email", required: true, disabled: isDefaultProfile },
         {
-          key: "role", type: "select", label: "Rôle", required: true,
-          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "user", label: "Utilisateur" }]
+          key: "role", type: "select", label: "Rôle", required: true, disabled: isDefaultProfile,
+          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "cashier", label: "Caissier" }, { value: "user", label: "Utilisateur" }]
         },
         {
-          key: "status", type: "select", label: "Statut", required: true,
+          key: "status", type: "select", label: "Statut", required: true, disabled: isDefaultProfile,
           options: [{ value: "active", label: "Actif" }, { value: "inactive", label: "Inactif" }]
         },
       ],
-      onDelete: async () => {
+
+      onPasswordChange: isDefaultProfile ? handleChangeOwnPasswordDialog : () => handleChangePasswordDialog(profile),
+      // La suppression et la modification sont surppimer si il s'agit du profil par défaut (généralement l'utilisateur connecté)
+
+      onDelete: isDefaultProfile ? null : async () => {
         const confirmed = window.confirm("Êtes-vous sûr de vouloir supprimer le profil " + profile.name + " ?");
         if (!confirmed) return;
         try {
@@ -137,20 +144,6 @@ function Parametres() {
         }
       },
     });
-  };
-
-  const handleToggleProfileActivation = async (profile) => {
-    try {
-      const isActive = profile.active ?? profile.status === "active";
-      const updatedProfile = {
-        active: !isActive,
-      };
-
-      await updateUser(profile.id, updatedProfile);
-      await refreshProfiles();
-    } catch (error) {
-      alert(error.message);
-    }
   };
 
   const refreshProfiles = async () => {
@@ -330,6 +323,52 @@ function Parametres() {
     return <div>Erreur : {error}</div>;
   }
 
+  // Changer le mot de passe d'un membre (depuis Parametres.jsx — bouton clé)
+  const handleChangePasswordDialog = (profile) => {
+    openDialog({
+      title: "Changer le mot de passe — " + profile.name,
+      fields: [
+        { key: "password", type: "password", label: "Nouveau mot de passe", required: true },
+        { key: "password_confirmation", type: "password", label: "Confirmer mot de passe", required: true },
+      ],
+      onSubmit: async (values) => {
+        if (values.password !== values.password_confirmation) {
+          alert("Les mots de passe ne correspondent pas.");
+          return;
+        }
+        try {
+          const result = await changeUserPassword(profile.id, values);
+          alert(result.message ?? "Mot de passe changé avec succès.");
+        } catch (error) {
+          alert(error.message);
+        }
+      },
+    });
+  };
+
+  // Changer son propre mot de passe (depuis n'importe quelle page)
+  const handleChangeOwnPasswordDialog = () => {
+    openDialog({
+      title: "Changer mon mot de passe",
+      fields: [
+        { key: "password", type: "password", label: "Nouveau mot de passe", required: true },
+        { key: "password_confirmation", type: "password", label: "Confirmer mot de passe", required: true },
+      ],
+      onSubmit: async (values) => {
+        if (values.password !== values.password_confirmation) {
+          alert("Les mots de passe ne correspondent pas.");
+          return;
+        }
+        try {
+          const result = await changeOwnPassword(values);
+          alert(result.message ?? "Mot de passe changé avec succès.");
+        } catch (error) {
+          alert(error.message);
+        }
+      },
+    });
+  };
+
   return (
     <div className="pageBloc">
       {/* Payment Method bloc */}
@@ -449,16 +488,17 @@ function Parametres() {
             overflowY: "auto",
           }}>
             {filteredProfiles.map((profile) => (
-                <ProfilBox
-                  key={profile.id}
-                  id={profile.id}
-                  name={profile.name}
-                  post={profile.role}
-                  email={profile.email}
-                  status={profile.status}
-                  onClick={() => handleProfileDetailsDialog(profile)}
-                />
-              ))}
+              <ProfilBox
+                key={profile.id}
+                id={profile.id}
+                name={profile.name}
+                post={profile.role}
+                email={profile.email}
+                status={profile.status}
+                onPasswordChange={profile.email === localStorage.getItem("user.email") ? handleChangeOwnPasswordDialog : () => handleChangePasswordDialog(profile)}
+                onClick={() => handleProfileDetailsDialog(profile)}
+              />
+            ))}
           </div>
         </div>
 

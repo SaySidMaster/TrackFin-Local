@@ -4,6 +4,7 @@ import trackfinLogo from '../assets/trackfin.png'
 import logoutIcon from '../assets/icons/logout.svg'
 import { useDialog } from "../context/DialogContext";
 import { logout } from "../services/AuthServices";
+import { changeOwnPassword } from "../services/UserServices";
 
 const SideNavBar = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const SideNavBar = () => {
   const menuItems = [
     { id: 1, page: '/dashboard', label: 'Tableau de bord', icon: 'dashboard.svg' },
     { id: 2, page: '/transactions', label: 'Transactions', icon: 'transactions.svg' },
-    { id: 3, page: '/debts', label: 'Dettes', icon: 'dettes.svg' },
+    { id: 3, page: '/debts', label: 'Dettes & Créances', icon: 'dettes.svg' },
     { id: 4, page: '/budgets', label: 'Budgets', icon: 'budgets.svg' },
     { id: 5, page: '/contacts', label: 'Clients & Fournisseurs', icon: 'contacts.svg' },
     { id: 6, page: '/parametres', label: 'Paramètres', icon: 'parametres.svg' },
@@ -35,30 +36,66 @@ const SideNavBar = () => {
     fontWeight: isActive ? 'bold' : 'normal',
   })
 
-  const { openDialog } = useDialog();
 
-  const handleUserDialog = async (e) => {
+  // Changer son propre mot de passe (depuis n'importe quelle page)
+  const handleChangeOwnPasswordDialog = () => {
     openDialog({
-      title: user.name || "Utilisateur",
-      fields: [
-        { key: "name", type: "text", label: "Nom", required: true },
-        { key: "email", type: "email", label: "Email", required: true },
-      ],
-      onSubmit: (values) => console.log("Nouveau user:", values),
-      onNewPassword: handlePasswordDialog, // ajoute la fonction pour le changement de mot de passe
-    });
-  };
-
-  const handlePasswordDialog = async (e) => {
-    openDialog({
-      title: "Changer le mot de passe",
+      title: "Changer mon mot de passe",
       fields: [
         { key: "password", type: "password", label: "Nouveau mot de passe", required: true },
-        { key: "confirmedpassword", type: "password", label: "Confirmer le mot de passe", required: true },
+        { key: "password_confirmation", type: "password", label: "Confirmer mot de passe", required: true },
       ],
-      onSubmit: (values) => console.log("Nouveau mot de passe:", values),
+      onSubmit: async (values) => {
+        if (values.password !== values.password_confirmation) {
+          alert("Les mots de passe ne correspondent pas.");
+          return;
+        }
+        try {
+          const result = await changeOwnPassword(values);
+          alert(result.message ?? "Mot de passe changé avec succès.");
+        } catch (error) {
+          alert(error.message);
+        }
+      },
     });
   };
+
+  const { openDialog } = useDialog();
+
+  const handleUserDialog = async () => {
+    // L'utilisateur connecté est par défaut et ne peut pas être modifiées
+
+    openDialog({
+      title: "Détails du profil — " + user.name,
+      initialValues: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      fields: [
+        { key: "name", type: "text", label: "Nom", required: true },
+        { key: "email", type: "email", label: "Email", required: true, disabled: true },
+        {
+          key: "role", type: "select", label: "Rôle", required: true, disabled: true,
+          options: [{ value: "admin", label: "Administrateur" }, { value: "accountant", label: "Comptable" }, { value: "cashier", label: "Caissier" }, { value: "user", label: "Utilisateur" }]
+        },
+      ],
+      onPasswordChange: handleChangeOwnPasswordDialog,
+      onSubmit: async (values) => {
+        try {
+          await updateUser(profile.id, {
+            name: values.name,
+            email: values.email,
+            role: values.role,
+          });
+          await refreshProfiles();
+        } catch (error) {
+          alert(error.message);
+        }
+      },
+    });
+  };
+
 
   const handleLogout = async (e) => {
     try {
@@ -75,13 +112,13 @@ const SideNavBar = () => {
     <nav className='SideNavBar'>
       <div className='navTop'>
         <div className='logo-container'>
-          <img src={trackfinLogo} style={{ width: '40px', height: '40px', objectFit:'contain' }} alt="" />
+          <img src={trackfinLogo} style={{ width: '40px', height: '40px', objectFit: 'contain' }} alt="" />
           <h3 className='AppTitle'>TrackFin</h3>
         </div>
 
-        <div style={{width: '100%', height: '1px', backgroundColor:'#71717170'}}></div>
-      
-        <div className='menuList' style={{width: '100%' }}>
+        <div style={{ width: '100%', height: '1px', backgroundColor: '#71717170' }}></div>
+
+        <div className='menuList' style={{ width: '100%' }}>
           {menuItems.map((item) => {
             const iconSrc = new URL(`../assets/icons/${item.icon}`, import.meta.url).href
             const isActive = location.pathname.includes(item.page) // 👈 compare avec la route actuelle
@@ -110,7 +147,7 @@ const SideNavBar = () => {
           <p style={{ margin: '0', textTransform: 'uppercase' }}>{user?.role || "Utilisateur"}</p>
         </button>
         <button onClick={handleLogout} style={{ border: 'none', background: 'transparent' }}>
-          <img src={logoutIcon} style={{ width: '25px', height: '25px', objectFit:'contain' }} alt="" />
+          <img src={logoutIcon} style={{ width: '25px', height: '25px', objectFit: 'contain' }} alt="" />
         </button>
       </div>
     </nav>

@@ -18,7 +18,7 @@ class PaymentMethodController extends Controller
             }
 
             $search = $request->get('search');
-            $query = PaymentMethod::where('user_id', $user->id);
+            $query = PaymentMethod::query();
             $team_id = $user->team_id;
             $query->where('team_id', $team_id);
 
@@ -42,7 +42,7 @@ class PaymentMethodController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $paymentMethod = PaymentMethod::where('id', $id)->where('user_id', $user->id)->first();
+            $paymentMethod = PaymentMethod::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$paymentMethod) {
                 return response()->json(['success' => false, 'message' => 'Méthode de paiement non trouvée'], 404);
             }
@@ -97,7 +97,7 @@ class PaymentMethodController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $paymentMethod = PaymentMethod::where('id', $id)->where('user_id', $user->id)->first();
+            $paymentMethod = PaymentMethod::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$paymentMethod) {
                 return response()->json(['success' => false, 'message' => 'Méthode de paiement non trouvée'], 404);
             }
@@ -121,7 +121,7 @@ class PaymentMethodController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $paymentMethod = PaymentMethod::where('id', $id)->where('user_id', $user->id)->first();
+            $paymentMethod = PaymentMethod::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$paymentMethod) {
                 return response()->json(['success' => false, 'message' => 'Méthode de paiement non trouvée'], 404);
             }

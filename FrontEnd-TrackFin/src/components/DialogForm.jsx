@@ -412,7 +412,7 @@ function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}
                                 type="button"
                                 onClick={onNewPassword}
                                 className="df-btn-delete"
-                                title="Supprimer"
+                                title="Changer le mot de passe"
                                 style={{
                                     width: "48px",
                                     height: "48px",

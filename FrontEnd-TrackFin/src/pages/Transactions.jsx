@@ -267,6 +267,12 @@ function Transactions() {
         >
           <div style={{ flex: 1, padding: "10px" }}>
 
+            {/* États de chargement et d'erreur */}
+            {loading && <p style={{ textAlign: "center", color: "#9ca3af" }}>Chargement...</p>}
+            {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
+
+            {/* Tableau des transactions */}
+            {!loading && !error && (
             <table style={{ width: "100%", height: "100%", borderCollapse: "collapse" }}>
 
               {/* THEAD */}
@@ -337,7 +343,7 @@ function Transactions() {
               </tbody>
 
             </table>
-
+            )}
           </div>
 
         </div>

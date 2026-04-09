@@ -27,8 +27,8 @@ class TransactionController extends Controller
             $contactId = $request->get('contact_id');
             $search = $request->get('search');
 
-            $query = Transaction::where('user_id', $user->id);
-            $team_id = Auth::user()->team_id;
+            $query = Transaction::query();
+            $team_id = $user->team_id;
             $query->where('team_id', $team_id);
             if ($type && in_array($type, ['income', 'expense'])) {
                 $query->where('type', $type);
@@ -58,7 +58,9 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->first();
+            $query = Transaction::where('id', $id)->where('team_id', $user->team_id);
+
+            $transaction = $query->first();
             if (!$transaction) {
                 return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
             }
@@ -107,21 +109,21 @@ class TransactionController extends Controller
             ];
 
             if ($request->has('category_id')) {
-                $cat = Category::where('id', $request->category_id)->where('user_id', $user->id)->first();
+                $cat = Category::where('id', $request->category_id)->where('team_id', $team_id)->first();
                 if (!$cat) {
                     return response()->json(['success' => false, 'message' => 'Catégorie invalide'], 404);
                 }
                 $data['category_id'] = $request->category_id;
             }
             if ($request->has('contact_id')) {
-                $cont = Contact::where('id', $request->contact_id)->where('user_id', $user->id)->first();
+                $cont = Contact::where('id', $request->contact_id)->where('team_id', $team_id)->first();
                 if (!$cont) {
                     return response()->json(['success' => false, 'message' => 'Contact invalide'], 404);
                 }
                 $data['contact_id'] = $request->contact_id;
             }
             if ($request->has('debt_id')) {
-                $debt = Debt::where('id', $request->debt_id)->where('user_id', $user->id)->first();
+                $debt = Debt::where('id', $request->debt_id)->where('team_id', $team_id)->first();
                 if (!$debt) {
                     return response()->json(['success' => false, 'message' => 'Dette invalide'], 404);
                 }
@@ -129,7 +131,7 @@ class TransactionController extends Controller
             }
 
             if ($request->has('payment_method_id')) {
-                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('team_id', $team_id)->first();
                 if (!$paymentMethod) {
                     return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
                 }
@@ -173,7 +175,7 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->first();
+            $transaction = Transaction::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$transaction) {
                 return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
             }
@@ -189,28 +191,28 @@ class TransactionController extends Controller
             if ($request->has('date')) $updateData['date'] = $request->date;
 
             if ($request->has('category_id')) {
-                $cat = Category::where('id', $request->category_id)->where('user_id', $user->id)->first();
+                $cat = Category::where('id', $request->category_id)->where('team_id', $user->team_id)->first();
                 if (!$cat) {
                     return response()->json(['success' => false, 'message' => 'Catégorie invalide'], 404);
                 }
                 $updateData['category_id'] = $request->category_id;
             }
             if ($request->has('contact_id')) {
-                $cont = Contact::where('id', $request->contact_id)->where('user_id', $user->id)->first();
+                $cont = Contact::where('id', $request->contact_id)->where('team_id', $user->team_id)->first();
                 if (!$cont) {
                     return response()->json(['success' => false, 'message' => 'Contact invalide'], 404);
                 }
                 $updateData['contact_id'] = $request->contact_id;
             }
             if ($request->has('payment_method_id')) {
-                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('team_id', $user->team_id)->first();
                 if (!$paymentMethod) {
                     return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
                 }
                 $updateData['payment_method_id'] = $request->payment_method_id;
             }
             if ($request->has('debt_id')) {
-                $debt = Debt::where('id', $request->debt_id)->where('user_id', $user->id)->first();
+                $debt = Debt::where('id', $request->debt_id)->where('team_id', $user->team_id)->first();
                 if (!$debt) {
                     return response()->json(['success' => false, 'message' => 'Dette invalide'], 404);
                 }
@@ -233,7 +235,7 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $transaction = Transaction::where('id', $id)->where('user_id', $user->id)->first();
+            $transaction = Transaction::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$transaction) {
                 return response()->json(['success' => false, 'message' => 'Transaction non trouvée'], 404);
             }

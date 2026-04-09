@@ -25,8 +25,8 @@ class DebtController extends Controller
             $type = $request->get('type');
             $status = $request->get('status');
 
-            $query = Debt::where('user_id', $user->id);
-            $team_id = Auth::user()->team_id;
+            $query = Debt::query();
+            $team_id = $user->team_id;
             $query->where('team_id', $team_id);
             if ($type && in_array($type, ['to_receive', 'to_pay'])) {
                 $query->where('type', $type);
@@ -50,7 +50,7 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $debt = Debt::where('id', $id)->where('user_id', $user->id)->with('contact', 'transactions')->first();
+            $debt = Debt::where('id', $id)->where('team_id', $user->team_id)->with('contact', 'transactions')->first();
             
             if (!$debt) {
                 return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
@@ -95,7 +95,7 @@ class DebtController extends Controller
             ];
 
             if ($request->has('contact_id')) {
-                $cont = Contact::where('id', $request->contact_id)->where('user_id', $user->id)->first();
+                $cont = Contact::where('id', $request->contact_id)->where('team_id', $user->team_id)->first();
                 if (!$cont) {
                     return response()->json(['success' => false, 'message' => 'Contact invalide'], 404);
                 }
@@ -133,7 +133,7 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $debt = Debt::where('id', $id)->where('user_id', $user->id)->first();
+            $debt = Debt::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$debt) {
                 return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
             }
@@ -146,7 +146,7 @@ class DebtController extends Controller
             if ($request->has('notes')) $updateData['notes'] = $request->notes;
 
             if ($request->has('contact_id')) {
-                $cont = Contact::where('id', $request->contact_id)->where('user_id', $user->id)->first();
+                $cont = Contact::where('id', $request->contact_id)->where('team_id', $user->team_id)->first();
                 if (!$cont) {
                     return response()->json(['success' => false, 'message' => 'Contact invalide'], 404);
                 }
@@ -169,7 +169,7 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $debt = Debt::where('id', $id)->where('user_id', $user->id)->first();
+            $debt = Debt::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$debt) {
                 return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
             }
@@ -204,7 +204,7 @@ class DebtController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $debt = Debt::where('id', $id)->where('user_id', $user->id)->first();
+            $debt = Debt::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$debt) {
                 return response()->json(['success' => false, 'message' => 'Dette non trouvée'], 404);
             }
@@ -215,7 +215,7 @@ class DebtController extends Controller
             }
 
             if ($request->has('payment_method_id')) {
-                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('user_id', $user->id)->first();
+                $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)->where('team_id', $user->team_id)->first();
                 if (!$paymentMethod) {
                     return response()->json(['success' => false, 'message' => 'Méthode de paiement invalide'], 404);
                 }

@@ -28,6 +28,10 @@ export function DialogProvider({ children }) {
         setValues(prev => ({ ...prev, [key]: value }));
     };
 
+    const handlePasswordChange = config.onPasswordChange ? () => {
+        config.onPasswordChange();
+    } : undefined;
+
     const handleSubmit = () => {
         if (config.onSubmit) config.onSubmit(values);
         closeDialog();
@@ -49,6 +53,7 @@ export function DialogProvider({ children }) {
                 buttonLabel={config.buttonLabel}
                 fields={config.fields ?? []}
                 values={values}
+                onNewPassword={handlePasswordChange}
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}

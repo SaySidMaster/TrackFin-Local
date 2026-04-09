@@ -39,3 +39,17 @@ export const deleteUser = async (userId) => {
 
   return data;
 };
+
+export const changeOwnPassword = async (data) => {
+  return await apiFetch("/user/password", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+};
+
+export const changeUserPassword = async (userId, data) => {
+  return await apiFetch(`/user/${userId}/password`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+};

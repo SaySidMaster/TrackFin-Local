@@ -21,8 +21,8 @@ class ContactController extends Controller
             $type = $request->get('type'); // client ou supplier
             $search = $request->get('search');
 
-            $query = Contact::where('user_id', $user->id);
-            $team_id = Auth::user()->team_id;
+            $query = Contact::query();
+            $team_id = $user->team_id;
             $query->where('team_id', $team_id);
 
             if ($type && in_array($type, ['client', 'supplier'])) {
@@ -48,7 +48,7 @@ class ContactController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
+            $contact = Contact::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$contact) {
                 return response()->json(['success' => false, 'message' => 'Contact non trouvé'], 404);
             }
@@ -117,7 +117,7 @@ class ContactController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
+            $contact = Contact::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$contact) {
                 return response()->json(['success' => false, 'message' => 'Contact non trouvé'], 404);
             }
@@ -145,7 +145,7 @@ class ContactController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $contact = Contact::where('id', $id)->where('user_id', $user->id)->first();
+            $contact = Contact::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$contact) {
                 return response()->json(['success' => false, 'message' => 'Contact non trouvé'], 404);
             }

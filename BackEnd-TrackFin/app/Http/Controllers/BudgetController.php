@@ -22,9 +22,9 @@ class BudgetController extends Controller
             $month = $request->get('month');
             $year = $request->get('year');
 
-            $query = Budget::where('user_id', $user->id);
+            $query = Budget::query();
             // S'assurer que les budgets appartiennent à la même équipe que l'utilisateur connecté
-            $team_id = Auth::user()->team_id;
+            $team_id = $user->team_id;
             $query->where('team_id', $team_id);
             if ($month) $query->where('month', $month);
             if ($year) $query->where('year', $year);
@@ -48,7 +48,7 @@ class BudgetController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $budget = Budget::where('id', $id)->where('user_id', $user->id)->first();
+            $budget = Budget::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$budget) {
                 return response()->json(['success' => false, 'message' => 'Budget non trouvé'], 404);
             }
@@ -80,8 +80,8 @@ class BudgetController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            // s'assurer que la catégorie appartient à l'utilisateur
-            $category = Category::where('id', $request->category_id)->where('user_id', $user->id)->first();
+            // s'assurer que la catégorie appartient à l'équipe
+            $category = Category::where('id', $request->category_id)->where('team_id', $user->team_id)->first();
             if (!$category) {
                 return response()->json(['success' => false, 'message' => 'Catégorie invalide'], 404);
             }
@@ -121,14 +121,14 @@ class BudgetController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $budget = Budget::where('id', $id)->where('user_id', $user->id)->first();
+            $budget = Budget::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$budget) {
                 return response()->json(['success' => false, 'message' => 'Budget non trouvé'], 404);
             }
 
             $updateData = [];
             if ($request->has('category_id')) {
-                $cat = Category::where('id', $request->category_id)->where('user_id', $user->id)->first();
+                $cat = Category::where('id', $request->category_id)->where('team_id', $user->team_id)->first();
                 if (!$cat) {
                     return response()->json(['success' => false, 'message' => 'Catégorie invalide'], 404);
                 }
@@ -153,7 +153,7 @@ class BudgetController extends Controller
                 return response()->json(['success' => false, 'message' => 'Utilisateur non authentifié'], 401);
             }
 
-            $budget = Budget::where('id', $id)->where('user_id', $user->id)->first();
+            $budget = Budget::where('id', $id)->where('team_id', $user->team_id)->first();
             if (!$budget) {
                 return response()->json(['success' => false, 'message' => 'Budget non trouvé'], 404);
             }

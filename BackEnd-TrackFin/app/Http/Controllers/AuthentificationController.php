@@ -125,7 +125,7 @@ class AuthentificationController extends Controller
         // Validation des données
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'role' => 'required|string|in:admin,accountant,user',
+            'role' => 'required|string|in:admin,accountant,cashier,user',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -340,7 +340,7 @@ class AuthentificationController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'sometimes|string|in:admin,accountant,user',
+            'role' => 'sometimes|string|in:admin,accountant,cashier,user',
             'password' => 'sometimes|string|min:8|confirmed',
         ]);
 
@@ -499,5 +499,49 @@ class AuthentificationController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    // Changer son propre mot de passe (tout utilisateur connecté)
+    public function changeOwnPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password'              => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Erreur de validation', 'errors' => $validator->errors()], 422);
+        }
+
+        $user = Auth::user();
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Mot de passe mis à jour avec succès']);
+    }
+
+    // Changer le mot de passe d'un membre de la team (admin uniquement)
+    public function changeUserPassword(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'password'              => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Erreur de validation', 'errors' => $validator->errors()], 422);
+        }
+
+        $admin  = Auth::user();
+        $target = User::where('id', $id)->where('team_id', $admin->team_id)->first();
+
+        if (!$target) {
+            return response()->json(['success' => false, 'message' => 'Utilisateur non trouvé dans votre équipe'], 404);
+        }
+
+        $target->password = bcrypt($request->password);
+        $target->save();
+
+        return response()->json(['success' => true, 'message' => 'Mot de passe du membre mis à jour avec succès']);
     }
 }
