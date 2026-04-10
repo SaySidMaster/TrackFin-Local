@@ -302,19 +302,6 @@ function Parametres() {
   const filteredCategories = categories;
   const filteredPaymentMethods = paymentMethods;
 
-  const filteredProfiles = useMemo(() => {
-    const list = Array.isArray(profiles) ? profiles : [];
-    return list.filter((profile) => {
-      if (!q) return true;
-      const search = q.toLowerCase();
-      return (
-        profile.name?.toLowerCase().includes(search) ||
-        profile.email?.toLowerCase().includes(search) ||
-        profile.role?.toLowerCase().includes(search)
-      );
-    });
-  }, [profiles, q]);
-
   if (loading) {
     return <div>Chargement des paramètres...</div>;
   }
@@ -450,7 +437,6 @@ function Parametres() {
 
       {/* Contenu de la page Paramètres */}
       <div className="ScrollableDiv" style={{
-        height: "90vh",
         display: "flex",
         gap: "12px",
       }}>
@@ -458,7 +444,7 @@ function Parametres() {
         {/* Profils bloc */}
         <div style={{
           width: "100%",
-          height: "100%",
+          height: "auto",
           display: "flex",
           flexDirection: "column",
           gap: "12px",
@@ -467,27 +453,16 @@ function Parametres() {
           borderRadius: "20px",
         }}>
           <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-            <h3>Profils</h3>
-            <form action="">
-              <div style={{ position: "relative", flex: 2, minWidth: "200px" }}>
-                <input
-                  type="text"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Rechercher..."
-                  style={{ ...inputStyle, width: "100%", padding: "0px 10px" }}
-                />
-              </div>
-            </form>
+            <h3>Equipes</h3>
             <CallToAction1 title="Ajouter" iconSrc={addIcon} action={handleNewProfilDialog} />
           </div>
-          <div className="ScrollableDiv" style={{
+          <div style={{
             width: "100%",
-            height: "100%",
+            height: "auto",
             gap: "12px",
             overflowY: "auto",
           }}>
-            {filteredProfiles.map((profile) => (
+            {profiles.map((profile) => (
               <ProfilBox
                 key={profile.id}
                 id={profile.id}
@@ -501,8 +476,6 @@ function Parametres() {
             ))}
           </div>
         </div>
-
-
 
       </div>
     </div>

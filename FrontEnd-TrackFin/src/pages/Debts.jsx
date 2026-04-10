@@ -213,13 +213,8 @@ function Debts() {
     });
   }, [debts, q, type, client, status]);
 
-  // ── Rendu ──────────────────────────────────────────────────────
-  return (
-    <div className="pageBloc">
-      <Banner
-        title={`${filteredDebts.length} Dettes`}
-        callToAction={<CallToAction1 title="Nouvelle dette" iconSrc={addIcon} action={handleNewDebtDialog} />}
-      />
+  // Bloc filtre partagé — rendu inline en desktop, popup en mobile via Banner
+  const filterBlock = (
 
       <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, contact, note..." }}
@@ -252,6 +247,17 @@ function Debts() {
           },
         ]}
       />
+  )
+
+  // ── Rendu ──────────────────────────────────────────────────────
+  return (
+    <div className="pageBloc">
+      <Banner
+        title={`${filteredDebts.length} Dettes`}
+        callToAction={<CallToAction1 title="Nouvelle dette" iconSrc={addIcon} action={handleNewDebtDialog} />}
+        filterContent={filterBlock}
+      />
+
 
       <div className="ScrollableDiv" style={{
         height: "75vh",

@@ -134,10 +134,9 @@ function Budgets() {
     });
   }, [budgets, q, cat, fromDate]);
 
-  return (
-    <div className="pageBloc">
-      <Banner title={`${filteredBudgets.length} Budgets`} callToAction={<CallToAction1 title="Nouveau budget" iconSrc={addIcon} action={handleNewBudgetDialog} />} />
-      <BlockFilter
+  // Bloc filtre partagé — rendu inline en desktop, popup en mobile via Banner
+  const filterBlock = (
+    <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
         selects={[
           { value: cat, onChange: e => setCat(e.target.value), placeholder: "Toute catégorie", options: categories.map(category => ({ value: category.id, label: category.name })) },
@@ -146,6 +145,14 @@ function Budgets() {
           from: { value: fromDate, mode: "month", onChange: e => setDFrom(e.target.value) },
         }}
       />
+  )
+
+  return (
+    <div className="pageBloc">
+      <Banner title={`${filteredBudgets.length} Budgets`} 
+      callToAction={<CallToAction1 title="Nouveau budget" iconSrc={addIcon} action={handleNewBudgetDialog} />}
+      filterContent={filterBlock} />
+      
 
       {/* Contenu de la page Budgets */}
       <div className="ScrollableDiv" style={{

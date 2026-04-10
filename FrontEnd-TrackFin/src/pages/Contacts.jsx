@@ -137,15 +137,21 @@ function Contacts() {
   if (loading) return <div>Chargement...</div>;
   if (error) return <div>Erreur: {error}</div>;
 
-  return (
-    <div className="pageBloc">
-      <Banner title={`${filteredContacts.length} Clients & Fournisseurs`} callToAction={<CallToAction1 title="Nouveau contact" iconSrc={addIcon} action={handleNewContactDialog} />} />
-      <BlockFilter
+  // Bloc filtre partagé — rendu inline en desktop, popup en mobile via Banner
+  const filterBlock = (
+    <BlockFilter
         search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, nom, email, téléphone..." }}
         selects={[
           { value: type, onChange: e => setType(e.target.value), placeholder: "Tout type", options: [{ value: "client", label: "Client" }, { value: "supplier", label: "Fournisseur" }] },
         ]}
       />
+  )
+
+  return (
+    <div className="pageBloc">
+      <Banner title={`${filteredContacts.length} Clients & Fournisseurs`} 
+      callToAction={<CallToAction1 title="Nouveau contact" iconSrc={addIcon} action={handleNewContactDialog} />}
+      filterContent={filterBlock} />
 
       {/* Contenu de la page Contacts */}
       <div className="ScrollableDiv" style={{

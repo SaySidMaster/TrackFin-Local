@@ -1,5 +1,6 @@
 import trashIcon from "../assets/icons/trash.svg";
 import passwordIcon from "../assets/icons/password.svg";
+import logoutIcon from "../assets/icons/logout.svg";
 
 /**
  * DialogForm — Formulaire modal modulaire
@@ -237,7 +238,7 @@ function Field({ field, value, onChange }) {
 }
 
 // ── Composant principal ───────────────────────────────────────────
-function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}, onChange, onSubmit, onDelete, onNewPassword, disabledSubmit, fields = [] }) {
+function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}, onChange, onLogout, onSubmit, onDelete, onNewPassword, disabledSubmit, fields = [] }) {
 
     if (!isOpen) return null;
 
@@ -430,6 +431,31 @@ function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}
                                 <img src={passwordIcon} alt="Supprimer" style={{ width: "20px", height: "20px", objectFit: "contain" }} />
                             </button>
                         )}
+                        {/* Bouton Déconnexion — affiché uniquement si onLogout est fourni */}
+                        {onLogout && (
+                            <button
+                                type="button"
+                                onClick={onLogout}
+                                className="df-btn-delete"
+                                title="Déconnexion"
+                                style={{
+                                    width: "48px",
+                                    height: "48px",
+                                    backgroundColor: "white",
+                                    border: "1.5px solid #d1d5db",
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "background-color 0.15s, border-color 0.15s",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <img src={logoutIcon} alt="Déconnexion" style={{ width: "20px", height: "20px", objectFit: "contain" }} />
+                            </button>
+                        )}
+
                     </div>
                 </form>
 

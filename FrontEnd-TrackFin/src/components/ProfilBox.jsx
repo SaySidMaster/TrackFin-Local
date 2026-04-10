@@ -48,7 +48,7 @@ function ProfilBox({ id, name, post, email, status, onClick }) {
           <h5 style={{ fontWeight: "700", margin: "0" }}>{name}</h5>
         </div>
 
-        <div style={{ display: "flex", flex: 1, flexDirection: "column", alignItems: "start", justifyContent: "center", gap: "8px", marginLeft: "12px" }}>
+        <div className="profilBoxEmail" style={{ display: "flex", flex: 1, flexDirection: "column", alignItems: "start", justifyContent: "center", gap: "8px", marginLeft: "12px" }}>
           <p style={{ textAlign: "left", fontSize: "13px", color: "#374151", margin: "0" }}>
             Email : {email}
           </p>

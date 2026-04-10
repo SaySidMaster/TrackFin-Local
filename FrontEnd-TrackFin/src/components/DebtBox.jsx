@@ -9,7 +9,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
         : { backgroundColor: "#fecdd3", color: "#e11d48" };
 
     return (
-        <div style={{
+        <div className="debtBox" style={{
             display: "flex",
             padding: "0",
             alignItems: "stretch",
@@ -22,7 +22,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
         }}>
 
             {/* ── 1. Bloc type (A payer / A recevoir) ───────── */}
-            <div style={{
+            <div className="debtType" style={{
                 backgroundColor: "#081226",
                 color: "white",
                 minWidth: "90px",
@@ -42,7 +42,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
             </div>
 
             {/* ── 2. Contact + date ─────────────────────────── */}
-            <div style={{
+            <div className="debtContact" style={{
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -73,7 +73,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
             </div>
 
             {/* ── 3. Note ───────────────────────────────────── */}
-            <div style={{
+            <div className="debtNote" style={{
                 flex: 1,
                 padding: "12px 16px",
                 fontSize: "13px",
@@ -97,7 +97,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
             </div>
 
             {/* ── 4. Montant ────────────────────────────────── */}
-            <div style={{
+            <div className="debtAmount" style={{
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -108,11 +108,12 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                 gap: "4px",
             }}>
                 <span style={{ fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", color: "#6b7280" }}>
-                    Montant ({currency})
+                    Montant ({currency}) <br />
+                    <span style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
+                        {Number(mount).toLocaleString("fr-FR")}
+                    </span>
                 </span>
-                <span style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
-                    {Number(mount).toLocaleString("fr-FR")}
-                </span>
+
                 {(restToPay !== undefined || restToPay === 0) && (
                     <span style={{ fontSize: "15px", color: "#0f172a" }}>
                         Reste : {Number(restToPay).toLocaleString("fr-FR")}
@@ -123,7 +124,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
 
 
             {/* ── 5. Bouton d'action ────────────────────────────────── */}
-            <div style={{
+            <div className="debtButton" style={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -131,7 +132,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                 minWidth: "140px",
                 gap: "8px",
             }}>
-                {restToPay != 0 ? 
+                {restToPay != 0 ?
                     <button onClick={onPay}
                         style={{
                             width: "100%",
@@ -149,7 +150,7 @@ function DebtBox({ id, type, typeContact, nameContact, date, status, note, mount
                     >
                         PAYER
                     </button>
-                : <div style={{ width: "100%" }}></div>}
+                    : <div style={{ width: "100%" }}></div>}
                 <button onClick={onClick}
                     style={{
                         width: "44px",

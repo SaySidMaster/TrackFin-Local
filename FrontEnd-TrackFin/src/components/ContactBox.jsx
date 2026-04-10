@@ -17,7 +17,7 @@ function ContactBox({ id, type, name, number, email, onClick }) {
             boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
             gap: "12px",
         }}>
-            <div style={{
+            <div className="contactBoxImgDiv" style={{
                 backgroundColor: "#081226",
                 color: "white",
                 display: "flex",
@@ -34,7 +34,7 @@ function ContactBox({ id, type, name, number, email, onClick }) {
                 letterSpacing: "0.3px",
                 lineHeight: "1.4",
             }}>
-                <img src={type === "Client" ? clientIcon : supplierIcon} style={{ width: "40px", height: "40px", objectFit: "contain" }} alt={type} />
+                <img className="contactBoxImg" src={type === "Client" ? clientIcon : supplierIcon} style={{ width: "40px", height: "40px", objectFit: "contain" }} alt={type} />
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "start", justifyContent: "center", gap: "12px" }}>

@@ -40,7 +40,7 @@ function Login() {
   };
 
   return (
-    <div style={{
+    <div className="auth-page" style={{
       width: "100vw",
       height: "100vh",
       display: "flex",
@@ -56,7 +56,7 @@ function Login() {
       `}</style>
 
       {/* ── Panneau gauche : branding ──────────────────────────────── */}
-      <div style={{
+      <div className="auth-branding" style={{
         width: "45%",
         backgroundColor: "#081226",
         display: "flex",
@@ -111,7 +111,7 @@ function Login() {
       </div>
 
       {/* ── Panneau droit : formulaire ─────────────────────────────── */}
-      <div style={{
+      <div className="auth-form-panel" style={{
         flex: 1,
         backgroundColor: "#F0F4F5",
         display: "flex",

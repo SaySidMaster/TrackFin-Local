@@ -40,7 +40,7 @@ function BlockFilter({ search, selects, amounts, dates }) {
   if (!hasRow1 && !hasRow2) return null;
  
   return (
-    <form style={{
+    <form className="BlockFilter" style={{
       display: "flex",
       flexDirection: "column",
       gap: "12px",

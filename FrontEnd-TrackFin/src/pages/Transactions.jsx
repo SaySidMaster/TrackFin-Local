@@ -79,7 +79,7 @@ function Transactions() {
         { key: "label", type: "text", label: "Label", required: true },
         { key: "date", type: "date", label: "Date", required: true, initialValue: new Date().toISOString().split("T")[0] },
         { key: "amount", type: "number", label: "Montant", required: true },
-        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true  },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
         {
           key: "type", type: "select", label: "Type", required: true,
           options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
@@ -127,7 +127,7 @@ function Transactions() {
         { key: "label", type: "text", label: "Label", required: true, disabled: true },
         { key: "date", type: "date", label: "Date", required: true, disabled: true },
         { key: "amount", type: "number", label: "Montant", required: true, disabled: true },
-        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true  },
+        { key: "description", type: "textarea", label: "Description", rows: 3, fullWidth: true },
         {
           key: "type", type: "select", label: "Type", required: true,
           options: [{ value: "income", label: "Revenu" }, { value: "expense", label: "Dépense" }]
@@ -148,16 +148,16 @@ function Transactions() {
         }
       ],
       onDelete: async (id) => {
-              const confirmed = window.confirm("Êtes-vous sûr de vouloir supprimer cette dette " + transaction.id + " ?");
-              if (confirmed) {
-                try {
-                  await deleteTransaction(transaction.id);
-                  await refreshTransactions();
-                } catch (error) {
-                  alert(error.message);
-                }
-              }
-            },
+        const confirmed = window.confirm("Êtes-vous sûr de vouloir supprimer cette dette " + transaction.id + " ?");
+        if (confirmed) {
+          try {
+            await deleteTransaction(transaction.id);
+            await refreshTransactions();
+          } catch (error) {
+            alert(error.message);
+          }
+        }
+      },
 
       onSubmit: async (values) => {
         try {
@@ -212,44 +212,58 @@ function Transactions() {
     });
   }, [transactions, q, type, cat, payMet, minPrice, maxPrice, fromDate, toDate]);
 
+  // Bloc filtre partagé — rendu inline en desktop, popup en mobile via Banner
+  const filterBlock = (
+    <BlockFilter
+      search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
+      selects={[
+        {
+          value: type,
+          onChange: e => setType(e.target.value),
+          placeholder: "Tout type",
+          options: [
+            { value: "income", label: "Revenu" },
+            { value: "expense", label: "Dépense" },
+          ]
+        },
+        {
+          value: cat,
+          onChange: e => setCat(e.target.value),
+          placeholder: "Toute catégorie",
+          options: categories.map(category => ({ value: category.id, label: category.name }))
+        },
+        {
+          value: payMet,
+          onChange: e => setPayMet(e.target.value),
+          placeholder: "Tout moyen de paiement",
+          options: paymentMethods.map(method => ({ value: method.id, label: method.name }))
+        },
+      ]}
+      amounts={{
+        min: { value: minPrice, onChange: e => setPMin(e.target.value), placeholder: "Montant min" },
+        max: { value: maxPrice, onChange: e => setPMax(e.target.value), placeholder: "Montant max" }
+      }}
+      dates={{
+        from: { value: fromDate, onChange: e => setDFrom(e.target.value), placeholder: "Date début" },
+        to: { value: toDate, onChange: e => setDTo(e.target.value), placeholder: "Date fin" }
+      }}
+    />
+  );
+
   return (
     <div className="pageBloc">
-      <Banner title={`${filteredTransactions.length} Transactions`} callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={handleNewTransactionDialog} />} />
-      <BlockFilter
-        search={{ value: q, onChange: e => setQ(e.target.value), placeholder: "Recherche, id, libellé,..." }}
-        selects={[
-          {
-            value: type,
-            onChange: e => setType(e.target.value),
-            placeholder: "Tout type",
-            options: [
-              { value: "income", label: "Revenu" },
-              { value: "expense", label: "Dépense" },
-            ]
-          },
-          {
-            value: cat,
-            onChange: e => setCat(e.target.value),
-            placeholder: "Toute catégorie",
-            options: categories.map(category => ({ value: category.id, label: category.name }))
-          },
-          {
-            value: payMet,
-            onChange: e => setPayMet(e.target.value),
-            placeholder: "Tout moyen de paiement",
-            options: paymentMethods.map(method => ({ value: method.id, label: method.name }))
-          },
-        ]}
-        amounts={{
-          min: { value: minPrice, onChange: e => setPMin(e.target.value), placeholder: "Montant min" },
-          max: { value: maxPrice, onChange: e => setPMax(e.target.value), placeholder: "Montant max" }
-        }}
-        dates={{
-          from: { value: fromDate, onChange: e => setDFrom(e.target.value), placeholder: "Date début" },
-          to: { value: toDate, onChange: e => setDTo(e.target.value), placeholder: "Date fin" }
-        }}
+
+      {/* Banner : reçoit filterContent → affiche le bouton Filtres en mobile */}
+      <Banner
+        title={`${filteredTransactions.length} Transactions`}
+        callToAction={<CallToAction1 title="Nouvelle transaction" iconSrc={addIcon} action={handleNewTransactionDialog} />}
+        filterContent={filterBlock}
       />
 
+      {/* BlockFilter inline — visible en desktop, masqué en mobile via CSS */}
+      <div className="block-filter-desktop">
+        {filterBlock}
+      </div>
 
       {/* Contenu de la page Transactions */}
 
@@ -273,76 +287,76 @@ function Transactions() {
 
             {/* Tableau des transactions */}
             {!loading && !error && (
-            <table style={{ width: "100%", height: "100%", borderCollapse: "collapse" }}>
+              <table style={{ width: "100%", height: "100%", borderCollapse: "collapse" }}>
 
-              {/* THEAD */}
-              <thead>
-                <tr
+                {/* THEAD */}
+                <thead>
+                  <tr
+                    style={{
+                      display: "table",
+                      width: "100%",
+                      tableLayout: "fixed",
+                      height: "50px",
+                      color: "#0000007c",
+                      fontWeight: "500",
+                      borderBottom: "1px solid #b8b4b471",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <th className="trxCol1" style={{ textAlign: "left", width: "100px" }}>Libellé</th>
+                    <th className="trxCol2" style={{ textAlign: "left", width: "100px" }}>Contact</th>
+                    <th className="trxCol3" style={{ textAlign: "right", width: "150px" }}>Montant ({currency})</th>
+                    <th className="trxCol4" style={{ textAlign: "right", width: "150px" }}>Catégorie</th>
+                    <th className="trxCol5" style={{ textAlign: "right", width: "150px" }}>Date</th>
+                  </tr>
+                </thead>
+
+                {/* TBODY SCROLL */}
+                <tbody
                   style={{
-                    display: "table",
-                    width: "100%",
-                    tableLayout: "fixed",
-                    height: "50px",
-                    color: "#0000007c",
-                    fontWeight: "500",
-                    borderBottom: "1px solid #b8b4b471",
+                    display: "block",
+                    height: "100%",
+                    overflowY: "auto",
                     fontSize: "14px",
                   }}
                 >
-                  <th style={{ textAlign: "left", width: "200px" }}>Libellé</th>
-                  <th style={{ textAlign: "left", width: "100px" }}>Contact</th>
-                  <th style={{ textAlign: "right", width: "150px" }}>Montant ({currency})</th>
-                  <th style={{ textAlign: "right", width: "150px" }}>Catégorie</th>
-                  <th style={{ textAlign: "right", width: "150px" }}>Date</th>
-                </tr>
-              </thead>
+                  {filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => {
+                    const categoryName = transaction.category?.name
+                      || categories.find(category => String(category.id) === String(transaction.category_id))?.name
+                      || "-";
+                    const date = transaction.created_at || transaction.date || transaction.updated_at;
+                    const formattedDate = date ? new Date(date).toLocaleDateString("fr-FR") : "-";
 
-              {/* TBODY SCROLL */}
-              <tbody
-                style={{
-                  display: "block",
-                  height: "100%",
-                  overflowY: "auto",
-                  fontSize: "14px",
-                }}
-              >
-                {filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => {
-                  const categoryName = transaction.category?.name
-                    || categories.find(category => String(category.id) === String(transaction.category_id))?.name
-                    || "-";
-                  const date = transaction.created_at || transaction.date || transaction.updated_at;
-                  const formattedDate = date ? new Date(date).toLocaleDateString("fr-FR") : "-";
-
-                  return (
-                    <tr
-                      onClick={() => handleTransactionDetailsDialog(transaction)}
-                      key={transaction.id}
-                      style={{
-                        cursor: "pointer",
-                        display: "table",
-                        width: "100%",
-                        tableLayout: "fixed",
-                        height: "50px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <td style={{ textAlign: "left", width: "200px" }}>{transaction.label ?? transaction.description}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.type === "income" ? "Revenu" : transaction.type === "expense" ? "Dépense" : transaction.type}</span></td>
-                      <td style={{ textAlign: "left", width: "100px" }}>{transaction.contact?.name || transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.name : "-"}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.type : "-"}</span></td>
-                      <td style={{ textAlign: "right", width: "150px" }}>{transaction.amount}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.payment_method_id ? paymentMethods.find(m => String(m.id) === String(transaction.payment_method_id))?.name : "-"}</span></td>
-                      <td style={{ textAlign: "right", width: "150px" }}>{categoryName}</td>
-                      <td style={{ textAlign: "right", width: "150px" }}>{formattedDate}</td>
+                    return (
+                      <tr
+                        onClick={() => handleTransactionDetailsDialog(transaction)}
+                        key={transaction.id}
+                        style={{
+                          cursor: "pointer",
+                          display: "table",
+                          width: "100%",
+                          tableLayout: "fixed",
+                          height: "50px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <td className="trxCol1" style={{ textAlign: "left", width: "100px" }}>{transaction.label ?? transaction.description}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.type === "income" ? "Revenu" : transaction.type === "expense" ? "Dépense" : transaction.type}</span></td>
+                        <td className="trxCol2" style={{ textAlign: "left", width: "100px" }}>{transaction.contact?.name || transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.name : "-"}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.contact_id ? contacts.find(c => String(c.id) === String(transaction.contact_id))?.type : "-"}</span></td>
+                        <td className="trxCol3" style={{ textAlign: "right", width: "150px" }}>{transaction.amount}<br /><span style={{ fontSize: "12px", color: "#6b7280" }}>{transaction.payment_method_id ? paymentMethods.find(m => String(m.id) === String(transaction.payment_method_id))?.name : "-"}</span></td>
+                        <td className="trxCol4" style={{ textAlign: "right", width: "150px" }}>{categoryName}</td>
+                        <td className="trxCol5" style={{ textAlign: "right", width: "150px" }}>{formattedDate}</td>
+                      </tr>
+                    );
+                  }) : (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: "center", padding: "25px 0", color: "#6b7280" }}>
+                        Aucune transaction trouvée
+                      </td>
                     </tr>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: "25px 0", color: "#6b7280" }}>
-                      Aucune transaction trouvée
-                    </td>
-                  </tr>
-                )}
-              </tbody>
+                  )}
+                </tbody>
 
-            </table>
+              </table>
             )}
           </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import trackfinLogo from '../assets/trackfin.png'
 import logoutIcon from '../assets/icons/logout.svg'
+import profileIcon from '../assets/icons/profile.svg'
 import { useDialog } from "../context/DialogContext";
 import { logout } from "../services/AuthServices";
 import { changeOwnPassword } from "../services/UserServices";
@@ -81,6 +82,7 @@ const SideNavBar = () => {
         },
       ],
       onPasswordChange: handleChangeOwnPasswordDialog,
+      onLogout: handleLogout,
       onSubmit: async (values) => {
         try {
           await updateUser(profile.id, {
@@ -139,15 +141,22 @@ const SideNavBar = () => {
               </Link>
             )
           })}
+          <div className="mobile-only" style={{ display: "flex", gap: 0 }}>
+            <button
+              onClick={handleUserDialog}
+              className="menu-item"
+              style={{ background: "transparent", border: "none" }}
+            >
+              <img src={profileIcon} alt="Profil" style={getIconStyle(false)} />
+              <span style={getLabelStyle(false)}>Profil</span>
+            </button>
+          </div>
         </div>
       </div>
       <div className='profileButton'>
         <button onClick={handleUserDialog} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'start', border: 'none', background: 'transparent' }}>
           <h3 style={{ margin: '0' }}>{user?.name || "Utilisateur"}</h3>
           <p style={{ margin: '0', textTransform: 'uppercase' }}>{user?.role || "Utilisateur"}</p>
-        </button>
-        <button onClick={handleLogout} style={{ border: 'none', background: 'transparent' }}>
-          <img src={logoutIcon} style={{ width: '25px', height: '25px', objectFit: 'contain' }} alt="" />
         </button>
       </div>
     </nav>

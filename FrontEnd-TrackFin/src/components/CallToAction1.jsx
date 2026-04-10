@@ -16,7 +16,7 @@ function CallToAction1({ title, iconSrc, action }) {
   };
 
   return <button style={style} onClick={action}>
-    <p>{title}</p>
+    <p className="bannerButtonTitle">{title}</p>
     <img
         src={iconSrc}
         alt='Ajouter'

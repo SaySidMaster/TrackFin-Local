@@ -32,6 +32,10 @@ export function DialogProvider({ children }) {
         config.onPasswordChange();
     } : undefined;
 
+    const handleLogout = config.onPasswordChange ? () => {
+        config.onLogout();
+    } : undefined;
+
     const handleSubmit = () => {
         if (config.onSubmit) config.onSubmit(values);
         closeDialog();
@@ -54,6 +58,7 @@ export function DialogProvider({ children }) {
                 fields={config.fields ?? []}
                 values={values}
                 onNewPassword={handlePasswordChange}
+                onLogout={handleLogout}
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
