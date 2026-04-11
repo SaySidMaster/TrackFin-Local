@@ -4,13 +4,13 @@ import supplierIcon from "../assets/icons/supplier.svg";
 function ContactBox({ id, type, name, number, email, onClick }) {
 
     return (
-        <button onClick={onClick} style={{
+        <button className="contactBox" onClick={onClick} style={{
             display: "flex",
             alignItems: "stretch",
             backgroundColor: "white",
             borderRadius: "14px",
             overflow: "hidden",
-            minWidth: "300px",
+            minWidth: "280px",
             width: "calc(50% - 6px)",
             padding: "20px",
             border: "1.5px solid #f1f5f9",

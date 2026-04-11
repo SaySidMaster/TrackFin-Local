@@ -63,6 +63,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
+}
+
+.banner-fixed {
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
+  background-color: #f0f2f5; /* même couleur que le fond */
 }
 
 .navTop {
@@ -268,11 +276,21 @@ button {
   }
 }
 
+@media (max-width: 675px) {
+
+  .budgetBox, .contactBox {
+    width: 100% !important;
+  }
+}
+
 /* ============================================
    Mobile strict (≤ 480px) — ajustements fins
    ============================================ */
 
 @media (max-width: 480px) {
+  .dialogFormGrid {
+    grid-column: 1 / -1 !important;
+  }
 
   .layoutBloc {
     padding: 8px;

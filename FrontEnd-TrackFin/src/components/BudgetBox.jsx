@@ -33,14 +33,14 @@ function BudgetBox({ id, category, date, amountLimit, spentAmount, onClick }) {
         }
     })();
     return (
-        <button onClick={onClick} style={{
+        <button className="budgetBox" onClick={onClick} style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "stretch",
             backgroundColor: "white",
             borderRadius: "14px",
             overflow: "hidden",
-            minWidth: "300px",
+            minWidth: "280px",
             width: "calc(50% - 6px)",
             padding: "20px",
             border: "1.5px solid #f1f5f9",

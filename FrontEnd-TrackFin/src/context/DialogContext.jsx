@@ -32,7 +32,7 @@ export function DialogProvider({ children }) {
         config.onPasswordChange();
     } : undefined;
 
-    const handleLogout = config.onPasswordChange ? () => {
+    const handleLogout = config.onLogout ? () => {
         config.onLogout();
     } : undefined;
 

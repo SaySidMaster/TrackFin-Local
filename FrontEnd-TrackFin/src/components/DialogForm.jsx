@@ -336,8 +336,9 @@ function DialogForm({ isOpen, onClose, title, subtitle, buttonLabel, values = {}
                     }}>
                         {fields.map((field) => (
                             <div
+                                className="dialogFormGrid"
                                 key={field.key}
-                                style={{ gridColumn: field.fullWidth ? "1 / -1" : "auto" }}
+                                style={{ gridColumn: field.fullWidth ? "1 / -1" : "auto" }} // 
                             >
                                 <Field
                                     field={field}

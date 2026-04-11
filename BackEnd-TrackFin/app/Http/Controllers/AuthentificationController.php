@@ -221,6 +221,14 @@ class AuthentificationController extends Controller
                 ], 401);
             }
 
+            // Verification du statut de l'utilisateur
+            if ($user->status === 'inactive') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Votre compte est inactif. Veuillez contacter l\'administrateur.'
+                ], 403);
+            }
+
             // Création du token d'authentification
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -341,6 +349,7 @@ class AuthentificationController extends Controller
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
             'role' => 'sometimes|string|in:admin,accountant,cashier,user',
+            'status' => 'sometimes|string|in:active,inactive',
             'password' => 'sometimes|string|min:8|confirmed',
         ]);
 
@@ -362,6 +371,7 @@ class AuthentificationController extends Controller
             if ($request->has('name')) $updateData['name'] = $request->name;
             if ($request->has('email')) $updateData['email'] = $request->email;
             if ($request->has('role')) $updateData['role'] = $request->role;
+            if ($request->has('status')) $updateData['status'] = $request->status;
             if ($request->has('password')) $updateData['password'] = Hash::make($request->password);
 
             // Mise à jour de l'utilisateur
@@ -375,6 +385,7 @@ class AuthentificationController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'status' => $user->status,
                     'updated_at' => $user->updated_at,
                 ]
             ]);

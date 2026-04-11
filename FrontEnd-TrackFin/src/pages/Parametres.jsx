@@ -137,6 +137,7 @@ function Parametres() {
             name: values.name,
             email: values.email,
             role: values.role,
+            status: values.status,
           });
           await refreshProfiles();
         } catch (error) {
