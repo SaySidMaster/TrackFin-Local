@@ -1,6 +1,10 @@
 # TrackFin
 
 > Application de Gestion Financière Simplifiée — Laravel 11 · React 19 · MySQL 8
+>
+>
+> Créer par HEMA Ouefaba Mariam Sakinatou et SIDIBE Saydil Oumar
+
 
 **🌐 Demo en ligne :** [https://front-end-track-fin.vercel.app](https://front-end-track-fin.vercel.app)
 
