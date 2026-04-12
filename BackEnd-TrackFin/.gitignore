@@ -1,5 +1,6 @@
 *.log
 .DS_Store
+.env
 .env.backup
 .env.production
 .phpactor.json
@@ -9,7 +10,6 @@
 /.nova
 /.phpunit.cache
 /.vscode
-/vendor
 /.zed
 /auth.json
 /node_modules
