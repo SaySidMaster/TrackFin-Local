@@ -2,13 +2,109 @@ import Banner from "../components/Banner";
 import { useState, useEffect } from "react";
 import { getDashboard } from "../services/DashboardServices";
 
+
+
 const fmt = (n) => Number(n).toLocaleString("fr-FR");
+
+// ── Histogramme VERTICAL (desktop ≥ 1024px) ──────────────────────────────
+const ChartVertical = ({ evolution, max, hovered, setHovered, currency, fmt }) => {
+  const gridLines = [0, 25, 50, 75, 100];
+  return (
+    <div style={{ position: "relative", height: "85%" }}>
+      {/* Lignes de grille + labels axe Y */}
+      {gridLines.map((pct) => (
+        <div key={pct} style={{
+          position: "absolute", left: 0, right: 0,
+          bottom: `${pct}%`,
+          display: "flex", alignItems: "center",
+          pointerEvents: "none", zIndex: 0,
+        }}>
+          <span style={{ fontSize: 10, color: "#cbd5e1", width: 36, textAlign: "right", paddingRight: 8, flexShrink: 0 }}>
+            {pct === 0 ? "0" : `${Math.round(max * pct / 100 / 1000)}k`}
+          </span>
+          <div style={{ flex: 1, height: 1, backgroundColor: pct === 0 ? "#e2e8f0" : "#f1f5f9" }} />
+        </div>
+      ))}
+
+      {/* Barres verticales */}
+      <div style={{
+        position: "absolute",
+        left: 44, right: 0, top: 0, bottom: 0,
+        display: "flex", alignItems: "flex-end",
+        gap: "6px", paddingBottom: 1,
+      }}>
+        {evolution.map((d, i) => {
+          const hauteurPct = (Math.abs(d.valeur) / max) * 100;
+          const isPos = d.valeur >= 0;
+          const isHov = hovered === i;
+
+          return (
+            <div
+              key={d.mois}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", cursor: "default" }}
+            >
+              {/* Tooltip */}
+              {isHov && (
+                <div style={{
+                  position: "absolute",
+                  bottom: `calc(${hauteurPct}% + 12px)`,
+                  backgroundColor: "#0f172a", color: "white",
+                  padding: "5px 10px", borderRadius: 8,
+                  fontSize: 11, fontWeight: 600,
+                  whiteSpace: "nowrap", zIndex: 10,
+                  pointerEvents: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+                }}>
+                  {isPos ? "+" : "-"}{fmt(Math.abs(d.valeur))} {currency}
+                  <div style={{
+                    position: "absolute", bottom: -5, left: "50%", transform: "translateX(-50%)",
+                    width: 0, height: 0,
+                    borderLeft: "5px solid transparent", borderRight: "5px solid transparent",
+                    borderTop: "5px solid #0f172a",
+                  }} />
+                </div>
+              )}
+
+              {/* Barre */}
+              <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end", position: "relative" }}>
+                <div className="db-bar" style={{
+                  width: "100%",
+                  height: `${hauteurPct}%`,
+                  borderRadius: "6px 6px 2px 2px",
+                  background: isPos
+                    ? isHov ? "linear-gradient(180deg,#22c55e,#16a34a)" : "linear-gradient(180deg,#4ade80,#16a34a)"
+                    : isHov ? "linear-gradient(180deg,#f87171,#dc2626)" : "linear-gradient(180deg,#fca5a5,#ef4444)",
+                  transition: "opacity 0.15s",
+                  animationDelay: `${i * 0.04}s`,
+                  opacity: isHov ? 0.85 : 1,
+                }} />
+              </div>
+
+              {/* Label mois */}
+              <span style={{
+                fontSize: 11,
+                fontWeight: isHov ? 700 : 500,
+                color: isHov ? "#0f172a" : "#94a3b8",
+                transition: "color 0.15s",
+                flexShrink: 0,
+              }}>
+                {d.mois}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 function Dashboard() {
   const currency = import.meta.env.VITE_CURRENCY;
-  const [hovered, setHovered]   = useState(null);
+  const [hovered, setHovered] = useState(null);
   const [dashData, setDashData] = useState(null);
-  const [loading, setLoading]   = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
   // Détection responsive
@@ -34,111 +130,19 @@ function Dashboard() {
     total_budget, rest_budget } = dashData;
 
   const STATS = [
-    { label: "Revenus",      valeur: total_income,      couleur: "#16a34a" },
-    { label: "Dépenses",     valeur: total_expense,     couleur: "#ef4444" },
-    { label: "Dettes",       valeur: total_debts,       couleur: "#f59e0b" },
-    { label: "Créances",     valeur: total_receivables, couleur: "#3b82f6" },
-    { label: "Budget",       valeur: total_budget,      couleur: "#8b5cf6" },
-    { label: "Reste budget", valeur: rest_budget,       couleur: "#0ea5e9" },
+    { label: "Revenus", valeur: total_income, couleur: "#16a34a" },
+    { label: "Dépenses", valeur: total_expense, couleur: "#ef4444" },
+    { label: "Dettes", valeur: total_debts, couleur: "#f59e0b" },
+    { label: "Créances", valeur: total_receivables, couleur: "#3b82f6" },
+    { label: "Budget", valeur: total_budget, couleur: "#8b5cf6" },
+    { label: "Reste budget", valeur: rest_budget, couleur: "#0ea5e9" },
   ];
 
-  const max     = Math.max(...evolution.map(d => Math.abs(d.valeur)), 1);
-  const total   = evolution.reduce((s, d) => s + d.valeur, 0);
+  const max = Math.max(...evolution.map(d => Math.abs(d.valeur)), 1);
+  const total = evolution.reduce((s, d) => s + d.valeur, 0);
   const positif = total >= 0;
 
-  // ── Histogramme VERTICAL (desktop ≥ 1024px) ──────────────────────────────
-  const ChartVertical = () => {
-    const gridLines = [0, 25, 50, 75, 100];
-    return (
-      <div style={{ position: "relative", height: "85%" }}>
-        {/* Lignes de grille + labels axe Y */}
-        {gridLines.map((pct) => (
-          <div key={pct} style={{
-            position: "absolute", left: 0, right: 0,
-            bottom: `${pct}%`,
-            display: "flex", alignItems: "center",
-            pointerEvents: "none", zIndex: 0,
-          }}>
-            <span style={{ fontSize: 10, color: "#cbd5e1", width: 36, textAlign: "right", paddingRight: 8, flexShrink: 0 }}>
-              {pct === 0 ? "0" : `${Math.round(max * pct / 100 / 1000)}k`}
-            </span>
-            <div style={{ flex: 1, height: 1, backgroundColor: pct === 0 ? "#e2e8f0" : "#f1f5f9" }} />
-          </div>
-        ))}
 
-        {/* Barres verticales */}
-        <div style={{
-          position: "absolute",
-          left: 44, right: 0, top: 0, bottom: 0,
-          display: "flex", alignItems: "flex-end",
-          gap: "6px", paddingBottom: 1,
-        }}>
-          {evolution.map((d, i) => {
-            const hauteurPct = (Math.abs(d.valeur) / max) * 100;
-            const isPos      = d.valeur >= 0;
-            const isHov      = hovered === i;
-
-            return (
-              <div
-                key={d.mois}
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
-                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", cursor: "default" }}
-              >
-                {/* Tooltip */}
-                {isHov && (
-                  <div style={{
-                    position: "absolute",
-                    bottom: `calc(${hauteurPct}% + 12px)`,
-                    backgroundColor: "#0f172a", color: "white",
-                    padding: "5px 10px", borderRadius: 8,
-                    fontSize: 11, fontWeight: 600,
-                    whiteSpace: "nowrap", zIndex: 10,
-                    pointerEvents: "none",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                  }}>
-                    {isPos ? "+" : "-"}{fmt(Math.abs(d.valeur))} {currency}
-                    <div style={{
-                      position: "absolute", bottom: -5, left: "50%", transform: "translateX(-50%)",
-                      width: 0, height: 0,
-                      borderLeft: "5px solid transparent", borderRight: "5px solid transparent",
-                      borderTop: "5px solid #0f172a",
-                    }}/>
-                  </div>
-                )}
-
-                {/* Barre */}
-                <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end", position: "relative" }}>
-                  <div className="db-bar" style={{
-                    width: "100%",
-                    height: `${hauteurPct}%`,
-                    borderRadius: "6px 6px 2px 2px",
-                    background: isPos
-                      ? isHov ? "linear-gradient(180deg,#22c55e,#16a34a)" : "linear-gradient(180deg,#4ade80,#16a34a)"
-                      : isHov ? "linear-gradient(180deg,#f87171,#dc2626)" : "linear-gradient(180deg,#fca5a5,#ef4444)",
-                    transition: "opacity 0.15s",
-                    animationDelay: `${i * 0.04}s`,
-                    opacity: isHov ? 0.85 : 1,
-                  }}/>
-                </div>
-
-                {/* Label mois */}
-                <span style={{
-                  fontSize: 11,
-                  fontWeight: isHov ? 700 : 500,
-                  color: isHov ? "#0f172a" : "#94a3b8",
-                  transition: "color 0.15s",
-                  flexShrink: 0,
-                }}>
-                  {d.mois}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   // ── Histogramme HORIZONTAL (mobile ≤ 1024px) ─────────────────────────────
   const ChartHorizontal = () => (
@@ -151,8 +155,8 @@ function Dashboard() {
     }}>
       {[...evolution].reverse().map((d, i) => {
         const largeurPct = (Math.abs(d.valeur) / max) * 100;
-        const isPos      = d.valeur >= 0;
-        const isHov      = hovered === i;
+        const isPos = d.valeur >= 0;
+        const isHov = hovered === i;
 
         return (
           <div
@@ -182,7 +186,7 @@ function Dashboard() {
               <div style={{
                 position: "absolute", inset: 0,
                 backgroundColor: "#f1f5f9", borderRadius: 6,
-              }}/>
+              }} />
 
               {/* Barre colorée */}
               <div className="db-bar-h" style={{
@@ -196,7 +200,7 @@ function Dashboard() {
                 transition: "width 0.4s cubic-bezier(.22,.68,0,1.2), opacity 0.15s",
                 opacity: isHov ? 0.85 : 1,
                 minWidth: d.valeur !== 0 ? 4 : 0,
-              }}/>
+              }} />
             </div>
 
             {/* Valeur à droite */}
@@ -267,7 +271,7 @@ function Dashboard() {
                 <span style={{ fontSize: 11, color: "#64748b", fontWeight: 500, textAlign: "center" }}>
                   {s.label}
                 </span>
-                <div style={{ width: 24, height: 3, borderRadius: 3, backgroundColor: s.couleur, marginTop: 2, opacity: 0.4 }}/>
+                <div style={{ width: 24, height: 3, borderRadius: 3, backgroundColor: s.couleur, marginTop: 2, opacity: 0.4 }} />
               </div>
             ))}
           </div>
@@ -313,11 +317,11 @@ function Dashboard() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: "#16a34a" }}/>
+                <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: "#16a34a" }} />
                 <span style={{ fontSize: 11, color: "#64748b" }}>Positif</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: "#ef4444" }}/>
+                <div style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: "#ef4444" }} />
                 <span style={{ fontSize: 11, color: "#64748b" }}>Négatif</span>
               </div>
             </div>
@@ -325,7 +329,14 @@ function Dashboard() {
         </div>
 
         {/* Graphique — vertical ou horizontal selon l'écran */}
-        {isMobile ? <ChartHorizontal /> : <ChartVertical />}
+        {isMobile ? <ChartHorizontal /> : <ChartVertical
+    evolution={evolution}
+    max={max}
+    hovered={hovered}
+    setHovered={setHovered}
+    currency={currency}
+    fmt={fmt}
+  />}
       </div>
     </div>
   );

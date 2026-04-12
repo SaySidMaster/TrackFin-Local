@@ -93,7 +93,7 @@ body {
   display: flex;
   width: 100%;
   justify-content: start;
-  align-items: center;
+  align-items: start !important;
   gap: 10px;
   height: 40px;
   padding-left: 20px;

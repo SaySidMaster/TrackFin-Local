@@ -38,6 +38,15 @@ class AuthentificationController extends Controller
             ], 422);
         }
 
+        // Vérification de l'email avant de créer l'utilisateur
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Un utilisateur avec cet email existe déjà'
+            ], 409);
+        }
+
+
         try {
             // Vérification de l'existence de l'utilisateur
             if (User::where('email', $request->email)->exists()) {
@@ -152,6 +161,14 @@ class AuthentificationController extends Controller
                 'success' => false,
                 'message' => 'Aucune équipe associée à l\'utilisateur connecté'
             ], 400);
+        }
+
+        // Vérification de l'email avant de créer l'utilisateur
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Un utilisateur avec cet email existe déjà'
+            ], 409);
         }
 
         try {

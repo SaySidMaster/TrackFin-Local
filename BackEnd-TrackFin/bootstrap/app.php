@@ -18,4 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })->create()
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: ['*']);
+        
+        // Ajoutez ceci
+        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+    });
