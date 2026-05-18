@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/test', [AuthentificationController::class, 'test'])->name('api.test');
+Route::get('/testdb', [AuthentificationController::class, 'testDB'])->name('api.testDB');
 
 //Authentification
 Route::post('/register', [AuthentificationController::class, 'register'])->name('api.register');

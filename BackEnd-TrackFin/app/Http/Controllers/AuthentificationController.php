@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Team;
+use App\Models\Test;
 use App\Models\Category;
 use App\Models\PaymentMethod;
 
@@ -18,6 +19,24 @@ class AuthentificationController extends Controller
         return response()->json([
             'message' => 'API en ligne !!'
         ]);
+    }
+    public function testDB(Request $request)
+    {
+        try {
+            Test::create([
+                'createdAt' => now(),
+                'url'       => $request->fullUrl(),
+            ]);
+
+            return response()->json([
+                'message' => 'Base de données joignable !!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Base de données injoignable !!',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
     
     public function register(Request $request)

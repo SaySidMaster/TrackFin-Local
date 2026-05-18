@@ -1,15 +1,19 @@
-FROM php:8.2-apache
+FROM php:8.3-cli
 
-# Extensions utiles (adapte selon tes besoins)
-RUN docker-php-ext-install pdo pdo_mysql mysqli
+RUN apt-get update && apt-get install -y \
+    git zip unzip libzip-dev libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath zip
 
-# Copie les fichiers
-COPY . /var/www/html/
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html
+WORKDIR /var/www
 
-# Active mod_rewrite si tu utilises des routes propres
-RUN a2enmod rewrite
+COPY . .
 
-EXPOSE 80
+RUN composer install --no-dev --optimize-autoloader
+
+RUN chmod -R 775 storage bootstrap/cache
+
+EXPOSE 10000
+
+CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && if [ \"${RUN_MIGRATIONS:-false}\" = \"true\" ]; then php artisan migrate --force; fi && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
